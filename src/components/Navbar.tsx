@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { usePOS } from '@/lib/store';
@@ -20,12 +20,12 @@ import {
   Users,
   Building2,
   Cpu,
-  ArrowLeft,
   QrCode,
   ShieldCheck,
   Lock,
   LogOut,
-  ShieldAlert,
+  ChevronDown,
+  LayoutGrid,
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -45,7 +45,21 @@ export default function Navbar() {
 
   const [time, setTime] = useState<string>('');
   const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsMoreMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Clock tick
   useEffect(() => {
     const update = () => {
       const now = new Date();
@@ -53,7 +67,6 @@ export default function Navbar() {
         now.toLocaleTimeString('tr-TR', {
           hour: '2-digit',
           minute: '2-digit',
-          second: '2-digit',
         })
       );
     };
@@ -89,10 +102,11 @@ export default function Navbar() {
     (d) => d.status === 'pending' || d.status === 'preparing' || d.status === 'on_the_way'
   ).length;
 
-  const navItems = [
+  // 1. Core daily operational tabs (Always visible, clean, 1-tap)
+  const coreNavItems = [
     {
       href: '/terminal/tables',
-      label: 'Kat & Masa Planı',
+      label: 'Masalar',
       icon: <Layers className="w-4 h-4" />,
     },
     {
@@ -100,7 +114,7 @@ export default function Navbar() {
       label: 'Hızlı POS',
       icon: <CreditCard className="w-4 h-4" />,
       badge: activeOrdersCount > 0 ? (
-        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500 text-stone-950 font-bold">
+        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500 text-stone-950 font-bold ml-1">
           {activeOrdersCount}
         </span>
       ) : null,
@@ -110,7 +124,7 @@ export default function Navbar() {
       label: 'Mutfak KDS',
       icon: <ChefHat className="w-4 h-4" />,
       badge: kdsPendingCount > 0 ? (
-        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500 text-white font-bold animate-pulse">
+        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500 text-white font-bold ml-1 animate-pulse">
           {kdsPendingCount}
         </span>
       ) : null,
@@ -120,59 +134,83 @@ export default function Navbar() {
       label: 'Paket Servis',
       icon: <Truck className="w-4 h-4" />,
       badge: activeDeliveryCount > 0 ? (
-        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-blue-500 text-white font-bold">
+        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-blue-500 text-white font-bold ml-1">
           {activeDeliveryCount}
         </span>
       ) : null,
     },
+  ];
+
+  // 2. Secondary & Backoffice modules in clean dropdown
+  const secondaryNavItems = [
     {
-      href: '/terminal/couriers',
-      label: 'Kurye Takip',
-      icon: <Bike className="w-4 h-4" />,
+      href: '/terminal/reports',
+      label: 'Kasa & Z-Raporu',
+      description: 'Günlük ciro, tahsilat ve mali özet',
+      icon: <FileSpreadsheet className="w-4 h-4 text-emerald-400" />,
     },
     {
       href: '/terminal/crm',
       label: 'Cari & Sadakat',
-      icon: <Users className="w-4 h-4" />,
+      description: 'Müşteri hesapları ve sadakat puanları',
+      icon: <Users className="w-4 h-4 text-sky-400" />,
+    },
+    {
+      href: '/terminal/couriers',
+      label: 'Kurye Takip',
+      description: 'Canlı kurye konumları ve teslimat süreleri',
+      icon: <Bike className="w-4 h-4 text-blue-400" />,
     },
     {
       href: '/terminal/inventory',
       label: 'Stok & Reçete',
-      icon: <Boxes className="w-4 h-4" />,
+      description: 'Hammadde maliyetleri ve kritik stok',
+      icon: <Boxes className="w-4 h-4 text-amber-400" />,
       badge: criticalStockCount > 0 ? (
-        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-red-600 text-white font-bold">
-          !
+        <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-600 text-white font-bold">
+          {criticalStockCount} Kritik
         </span>
       ) : null,
     },
     {
       href: '/terminal/branches',
       label: 'Zincir Şubeler',
-      icon: <Building2 className="w-4 h-4" />,
+      description: 'Çoklu şube performansı ve yetkileri',
+      icon: <Building2 className="w-4 h-4 text-indigo-400" />,
     },
     {
       href: '/terminal/hardware',
-      label: 'Donanım & E-Dönüşüm',
-      icon: <Cpu className="w-4 h-4" />,
-    },
-    {
-      href: '/terminal/reports',
-      label: 'Z-Raporu & Finans',
-      icon: <FileSpreadsheet className="w-4 h-4" />,
+      label: 'Donanım & Yazıcılar',
+      description: 'Adisyon yazıcıları, terazi ve barkod',
+      icon: <Cpu className="w-4 h-4 text-teal-400" />,
     },
     {
       href: '/terminal/admin',
-      label: 'Admin Paneli',
+      label: 'Yönetici & Güvenlik',
+      description: 'Personel PIN, roller, audit log ve ayarlar',
       icon: <ShieldCheck className="w-4 h-4 text-amber-400" />,
       adminOnly: true,
     },
   ];
 
+  // Filter accessible items
+  const accessibleSecondaryItems = secondaryNavItems.filter((item) =>
+    canAccessModule(currentStaff.role, item.href)
+  );
+
+  const isSecondaryActive = secondaryNavItems.some(
+    (item) => pathname === item.href || pathname?.startsWith(item.href + '/')
+  );
+
+  const activeSecondaryItem = secondaryNavItems.find(
+    (item) => pathname === item.href || pathname?.startsWith(item.href + '/')
+  );
+
   const roleMeta = ROLE_DEFINITIONS[currentStaff.role] || ROLE_DEFINITIONS.waiter;
 
   return (
-    <header className="bg-[#0e111a] border-b border-[#1e2433] px-3.5 py-2 flex items-center justify-between sticky top-0 z-40 select-none shadow-xl">
-      {/* Brand & Concept Header */}
+    <header className="bg-[#0e111a] border-b border-[#1e2433] px-4 py-2.5 flex items-center justify-between sticky top-0 z-40 select-none shadow-xl">
+      {/* Left: Brand & Quick QR */}
       <div className="flex items-center gap-3">
         <Link
           href="/terminal/tables"
@@ -184,21 +222,13 @@ export default function Navbar() {
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-serif tracking-wider text-xs font-bold text-stone-100 group-hover:text-amber-400 transition-colors">
+              <span className="font-serif tracking-wider text-sm font-bold text-stone-100 group-hover:text-amber-400 transition-colors">
                 ZADİSYON
               </span>
-              <span className="text-amber-400 text-[10px] font-sans font-semibold px-1.5 py-0.2 rounded bg-amber-500/10 border border-amber-500/20">
+              <span className="text-amber-400 text-[10px] font-sans font-semibold px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20">
                 {currentBranch.name}
               </span>
-              {securitySettings.emergencyLockdown && (
-                <span className="text-red-400 bg-red-500/20 border border-red-500/40 text-[9px] font-bold px-1.5 py-0.2 rounded animate-pulse">
-                  KİLİTLİ
-                </span>
-              )}
             </div>
-            <p className="text-[10px] text-stone-400 font-mono tracking-tight">
-              Zynox POS OS v3.4 • Kurumsal Adisyon
-            </p>
           </div>
         </Link>
 
@@ -206,7 +236,7 @@ export default function Navbar() {
           href="/menu"
           target="_blank"
           onClick={() => sounds.playTap()}
-          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold transition-all ml-2"
+          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold transition-all ml-1"
           title="Müşteri QR Menüyü Yeni Sekmede Aç"
         >
           <QrCode className="w-3.5 h-3.5 text-purple-400" />
@@ -214,43 +244,113 @@ export default function Navbar() {
         </Link>
       </div>
 
-      {/* Main Module Tabs (Real Next.js Links with RBAC indicators) */}
-      <nav className="flex items-center gap-1 bg-[#090b10] p-1 rounded-xl border border-stone-800/80 shadow-inner overflow-x-auto max-w-[54vw] custom-scrollbar">
-        {navItems.map((item) => {
+      {/* Middle: 4 Operational Buttons + "Daha Fazla / Yönetim" Dropdown */}
+      <nav className="flex items-center gap-1.5 bg-[#090b10] p-1 rounded-xl border border-stone-800/80 shadow-inner">
+        {coreNavItems.map((item) => {
           const isActive =
             pathname === item.href ||
             (item.href === '/terminal/tables' && pathname === '/terminal');
           const hasAccess = canAccessModule(currentStaff.role, item.href);
+
+          if (!hasAccess) return null;
 
           return (
             <Link
               key={item.href}
               href={item.href}
               onClick={() => sounds.playTap()}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                 isActive
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20'
-                  : hasAccess
-                  ? 'text-stone-300 hover:text-white hover:bg-stone-800/50'
-                  : 'text-stone-500 hover:text-stone-400 opacity-60'
+                  : 'text-stone-300 hover:text-white hover:bg-stone-800/60'
               }`}
-              title={!hasAccess ? 'Erişim için yönetici yetkisi gerekir' : undefined}
             >
               {item.icon}
               <span>{item.label}</span>
-              {!hasAccess && <Lock className="w-2.5 h-2.5 text-stone-500" />}
               {item.badge}
             </Link>
           );
         })}
+
+        {/* Secondary Modules Menu ("Daha Fazla / Yönetim") */}
+        {accessibleSecondaryItems.length > 0 && (
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => {
+                sounds.playTap();
+                setIsMoreMenuOpen(!isMoreMenuOpen);
+              }}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+                isSecondaryActive
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold'
+                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>
+                {isSecondaryActive && activeSecondaryItem
+                  ? activeSecondaryItem.label
+                  : 'Yönetim & Diğer'}
+              </span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                  isMoreMenuOpen ? 'rotate-180 text-amber-400' : ''
+                }`}
+              />
+            </button>
+
+            {/* Dropdown Flyout */}
+            {isMoreMenuOpen && (
+              <div className="absolute top-full right-0 mt-2 w-72 bg-[#121622] border border-stone-700/80 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-800/80 mb-1 flex items-center justify-between">
+                  <span>Arka Ofis & Yönetim</span>
+                  <span className="text-amber-400">{currentStaff.role.toUpperCase()}</span>
+                </div>
+                <div className="space-y-1">
+                  {accessibleSecondaryItems.map((item) => {
+                    const isItemActive = pathname === item.href;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => {
+                          sounds.playTap();
+                          setIsMoreMenuOpen(false);
+                        }}
+                        className={`flex items-start gap-3 p-2.5 rounded-xl transition-all ${
+                          isItemActive
+                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold'
+                            : 'hover:bg-stone-800/70 text-stone-300 hover:text-white'
+                        }`}
+                      >
+                        <div className="p-1.5 rounded-lg bg-[#0a0d14] border border-stone-800 shrink-0 mt-0.5">
+                          {item.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold">{item.label}</span>
+                            {item.badge}
+                          </div>
+                          <p className="text-[10px] text-stone-400 truncate mt-0.5">
+                            {item.description}
+                          </p>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </nav>
 
       {/* Right Controls: Clock, Sound, Lock, Logout, Staff Profile */}
       <div className="flex items-center gap-2">
         {/* Clock */}
-        <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#141824] border border-stone-800/80 text-stone-300 font-mono text-xs">
+        <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#141824] border border-stone-800/80 text-stone-300 font-mono text-xs">
           <Clock className="w-3.5 h-3.5 text-amber-400" />
-          <span>{time || '20:15:00'}</span>
+          <span>{time || '20:15'}</span>
         </div>
 
         {/* Audio Mute Toggle */}
@@ -278,7 +378,7 @@ export default function Navbar() {
         {/* Quick Logout Button */}
         <button
           onClick={handleLogout}
-          title="Oturumu Güvenli Kapat ve Çıkış Yap"
+          title="Oturumu Kapat ve Çıkış Yap"
           className="p-1.5 rounded-lg bg-[#141824] border border-stone-800 text-stone-400 hover:text-rose-400 hover:border-rose-500/40 transition-colors"
         >
           <LogOut className="w-4 h-4" />
@@ -290,7 +390,7 @@ export default function Navbar() {
             sounds.playTap();
             setIsPinModalOpen(true);
           }}
-          className="flex items-center gap-2 pl-2 pr-2.5 py-1.5 rounded-xl bg-[#141824] border border-stone-800 hover:border-amber-500/40 transition-all text-left group"
+          className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl bg-[#141824] border border-stone-800 hover:border-amber-500/40 transition-all text-left group"
         >
           <div
             className={`w-6 h-6 rounded-lg ${currentStaff.avatarBg} text-white flex items-center justify-center font-bold text-xs shadow-sm`}
@@ -301,7 +401,7 @@ export default function Navbar() {
             <div className="text-xs font-semibold text-stone-200 group-hover:text-amber-400 transition-colors truncate max-w-[110px]">
               {currentStaff.name}
             </div>
-            <div className="text-[9px] text-amber-400/90 font-medium">
+            <div className="text-[9px] text-amber-400 font-medium">
               {roleMeta.badgeText}
             </div>
           </div>

@@ -154,43 +154,28 @@ export default function AdminPage() {
       <div className="px-6 py-4 bg-[#0e111a] border-b border-stone-800/80 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/10">
-            <ShieldCheck className="w-6 h-6" />
+            <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold font-serif text-stone-100">
-                ZAdisyon Yönetici & Güvenlik Konsolu
+              <h1 className="text-base font-bold text-stone-100">
+                Yönetici & Güvenlik Konsolu
               </h1>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold">
                 {currentBranch.name}
               </span>
             </div>
             <p className="text-xs text-stone-400">
-              Personel yetkilendirme, denetim günlüğü, şifreleme ve ciro yönetimi
+              Ciro ve satış özetleri, personel yetkilendirme ve sistem denetimi
             </p>
           </div>
         </div>
 
-        {/* Emergency Lockdown Action */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              sounds.playTap();
-              toggleEmergencyLockdown();
-            }}
-            className={`px-3.5 py-2 rounded-xl border text-xs font-bold flex items-center gap-2 transition-all ${
-              securitySettings.emergencyLockdown
-                ? 'bg-red-600 text-white border-red-500 shadow-lg shadow-red-600/30 animate-pulse'
-                : 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border-rose-500/30'
-            }`}
-          >
-            <ShieldAlert className="w-4 h-4" />
-            <span>
-              {securitySettings.emergencyLockdown
-                ? 'ACİL KİLİT AKTİF (Kaldır)'
-                : 'Acil Durum Kilidi (Lockdown)'}
-            </span>
-          </button>
+        {/* Quick Role Badge */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs px-3 py-1.5 rounded-xl bg-[#141824] border border-stone-800 text-stone-300 font-medium">
+            Yetkili: <strong className="text-amber-400">{currentStaff.name}</strong> ({currentStaff.role.toUpperCase()})
+          </span>
         </div>
       </div>
 
@@ -738,6 +723,45 @@ export default function AdminPage() {
                 <span className="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
                   Sertifika Geçerli
                 </span>
+              </div>
+            </div>
+
+            {/* Emergency Lockdown Zone */}
+            <div className="p-6 rounded-3xl bg-[#1f1519] border border-rose-500/30 space-y-3">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400">
+                    <ShieldAlert className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-stone-200">
+                      Acil Durum Terminal Kilidi (Lockdown)
+                    </h4>
+                    <p className="text-xs text-stone-400">
+                      Tüm terminal ekranlarını anında dondurur ve sadece yetkili şifresiyle açılır.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    sounds.playTap();
+                    toggleEmergencyLockdown();
+                  }}
+                  className={`px-4 py-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 transition-all ${
+                    securitySettings.emergencyLockdown
+                      ? 'bg-rose-600 text-white border-rose-500 shadow-lg shadow-rose-600/40 animate-pulse'
+                      : 'bg-rose-500/10 hover:bg-rose-500/25 text-rose-300 border-rose-500/40'
+                  }`}
+                >
+                  <ShieldAlert className="w-4 h-4" />
+                  <span>
+                    {securitySettings.emergencyLockdown
+                      ? 'ACİL KİLİT AKTİF (Kaldır)'
+                      : 'Acil Durum Kilidini Başlat'}
+                  </span>
+                </button>
               </div>
             </div>
 
