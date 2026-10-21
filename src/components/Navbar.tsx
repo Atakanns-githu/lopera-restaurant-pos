@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { usePOS } from '@/lib/store';
 import { sounds } from '@/lib/audio';
+import { canAccessModule, ROLE_DEFINITIONS } from '@/lib/rbac';
 import {
   Layers,
   CreditCard,
@@ -22,10 +23,14 @@ import {
   ArrowLeft,
   QrCode,
   ShieldCheck,
+  Lock,
+  LogOut,
+  ShieldAlert,
 } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const {
     currentStaff,
     setIsPinModalOpen,
@@ -33,6 +38,9 @@ export default function Navbar() {
     inventory,
     deliveryOrders,
     currentBranch,
+    lockScreen,
+    logout,
+    securitySettings,
   } = usePOS();
 
   const [time, setTime] = useState<string>('');
@@ -57,6 +65,17 @@ export default function Navbar() {
   const toggleSound = () => {
     const muted = sounds.toggleMute();
     setIsMuted(muted);
+  };
+
+  const handleLogout = () => {
+    sounds.playTap();
+    logout();
+    router.push('/login');
+  };
+
+  const handleLock = () => {
+    sounds.playTap();
+    lockScreen();
   };
 
   // Badge counts
@@ -141,57 +160,67 @@ export default function Navbar() {
       label: 'Z-Raporu & Finans',
       icon: <FileSpreadsheet className="w-4 h-4" />,
     },
+    {
+      href: '/terminal/admin',
+      label: 'Admin Paneli',
+      icon: <ShieldCheck className="w-4 h-4 text-amber-400" />,
+      adminOnly: true,
+    },
   ];
 
+  const roleMeta = ROLE_DEFINITIONS[currentStaff.role] || ROLE_DEFINITIONS.waiter;
+
   return (
-    <header className="bg-[#0e111a] border-b border-[#1e2433] px-3 py-2 flex items-center justify-between sticky top-0 z-40 select-none shadow-xl">
-      {/* Brand & Concept & Back to Website */}
+    <header className="bg-[#0e111a] border-b border-[#1e2433] px-3.5 py-2 flex items-center justify-between sticky top-0 z-40 select-none shadow-xl">
+      {/* Brand & Concept Header */}
       <div className="flex items-center gap-3">
         <Link
-          href="/"
+          href="/terminal/tables"
           onClick={() => sounds.playTap()}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#141824] hover:bg-[#1a2032] border border-stone-800 text-stone-300 hover:text-amber-400 text-xs font-semibold transition-all group"
-          title="Marka Tanıtım Sitesine Dön"
+          className="flex items-center gap-2.5 group"
         >
-          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-          <span className="hidden sm:inline">Marka Sitesi</span>
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/20 border border-amber-400/40">
+            <span className="font-serif font-black text-sm text-stone-950">Z</span>
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="font-serif tracking-wider text-xs font-bold text-stone-100 group-hover:text-amber-400 transition-colors">
+                ZADİSYON
+              </span>
+              <span className="text-amber-400 text-[10px] font-sans font-semibold px-1.5 py-0.2 rounded bg-amber-500/10 border border-amber-500/20">
+                {currentBranch.name}
+              </span>
+              {securitySettings.emergencyLockdown && (
+                <span className="text-red-400 bg-red-500/20 border border-red-500/40 text-[9px] font-bold px-1.5 py-0.2 rounded animate-pulse">
+                  KİLİTLİ
+                </span>
+              )}
+            </div>
+            <p className="text-[10px] text-stone-400 font-mono tracking-tight">
+              Zynox POS OS v3.4 • Kurumsal Adisyon
+            </p>
+          </div>
         </Link>
 
         <Link
           href="/menu"
           target="_blank"
           onClick={() => sounds.playTap()}
-          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold transition-all"
+          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold transition-all ml-2"
           title="Müşteri QR Menüyü Yeni Sekmede Aç"
         >
           <QrCode className="w-3.5 h-3.5 text-purple-400" />
-          <span>Müşteri Menü</span>
+          <span>Müşteri QR</span>
         </Link>
-
-        <div className="flex items-center gap-2.5 pl-2 border-l border-stone-800">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/20 border border-amber-400/30">
-            <span className="font-serif font-black text-sm text-stone-950">Z</span>
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-serif tracking-wider text-xs font-bold text-stone-100">
-                ZADİSYON
-              </span>
-              <span className="text-amber-400 text-[10px] font-sans font-semibold px-1.5 py-0.2 rounded bg-amber-500/10 border border-amber-500/20">
-                {currentBranch.name}
-              </span>
-            </div>
-            <p className="text-[10px] text-stone-400 font-mono tracking-tight">
-              Zynox POS OS v3.4
-            </p>
-          </div>
-        </div>
       </div>
 
-      {/* Main Module Tabs (Real Next.js Links) */}
-      <nav className="flex items-center gap-1 bg-[#090b10] p-1 rounded-xl border border-stone-800/80 shadow-inner overflow-x-auto max-w-[58vw] custom-scrollbar">
+      {/* Main Module Tabs (Real Next.js Links with RBAC indicators) */}
+      <nav className="flex items-center gap-1 bg-[#090b10] p-1 rounded-xl border border-stone-800/80 shadow-inner overflow-x-auto max-w-[54vw] custom-scrollbar">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href === '/terminal/tables' && pathname === '/terminal');
+          const isActive =
+            pathname === item.href ||
+            (item.href === '/terminal/tables' && pathname === '/terminal');
+          const hasAccess = canAccessModule(currentStaff.role, item.href);
 
           return (
             <Link
@@ -201,21 +230,25 @@ export default function Navbar() {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                 isActive
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20'
-                  : 'text-stone-300 hover:text-white hover:bg-stone-800/50'
+                  : hasAccess
+                  ? 'text-stone-300 hover:text-white hover:bg-stone-800/50'
+                  : 'text-stone-500 hover:text-stone-400 opacity-60'
               }`}
+              title={!hasAccess ? 'Erişim için yönetici yetkisi gerekir' : undefined}
             >
               {item.icon}
               <span>{item.label}</span>
+              {!hasAccess && <Lock className="w-2.5 h-2.5 text-stone-500" />}
               {item.badge}
             </Link>
           );
         })}
       </nav>
 
-      {/* Right Controls: Clock, Sound, Staff PIN Switcher */}
+      {/* Right Controls: Clock, Sound, Lock, Logout, Staff Profile */}
       <div className="flex items-center gap-2">
         {/* Clock */}
-        <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#141824] border border-stone-800/80 text-stone-300 font-mono text-xs">
+        <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#141824] border border-stone-800/80 text-stone-300 font-mono text-xs">
           <Clock className="w-3.5 h-3.5 text-amber-400" />
           <span>{time || '20:15:00'}</span>
         </div>
@@ -233,6 +266,24 @@ export default function Navbar() {
           )}
         </button>
 
+        {/* Quick Screen Lock Button */}
+        <button
+          onClick={handleLock}
+          title="Terminal Ekranını Kilitle"
+          className="p-1.5 rounded-lg bg-[#141824] border border-stone-800 text-stone-300 hover:text-amber-400 hover:border-amber-500/40 transition-colors"
+        >
+          <Lock className="w-4 h-4" />
+        </button>
+
+        {/* Quick Logout Button */}
+        <button
+          onClick={handleLogout}
+          title="Oturumu Güvenli Kapat ve Çıkış Yap"
+          className="p-1.5 rounded-lg bg-[#141824] border border-stone-800 text-stone-400 hover:text-rose-400 hover:border-rose-500/40 transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+        </button>
+
         {/* Staff Switcher PIN button */}
         <button
           onClick={() => {
@@ -247,14 +298,11 @@ export default function Navbar() {
             {currentStaff.name.charAt(0)}
           </div>
           <div className="hidden sm:block">
-            <div className="text-xs font-semibold text-stone-200 group-hover:text-amber-400 transition-colors">
+            <div className="text-xs font-semibold text-stone-200 group-hover:text-amber-400 transition-colors truncate max-w-[110px]">
               {currentStaff.name}
             </div>
-            <div className="text-[9px] text-stone-400 capitalize">
-              {currentStaff.role === 'waiter' && 'Garson'}
-              {currentStaff.role === 'cashier' && 'Kasiyer'}
-              {currentStaff.role === 'chef' && 'Mutfak Şefi'}
-              {currentStaff.role === 'manager' && 'Müdür'}
+            <div className="text-[9px] text-amber-400/90 font-medium">
+              {roleMeta.badgeText}
             </div>
           </div>
         </button>

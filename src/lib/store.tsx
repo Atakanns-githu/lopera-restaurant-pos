@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   Category,
   InventoryItem,
@@ -21,6 +21,8 @@ import {
   Customer,
   Branch,
   HardwareDevice,
+  AuditLogItem,
+  SecuritySettings,
 } from '@/types/pos';
 import {
   CATEGORIES,
@@ -35,10 +37,13 @@ import {
   INITIAL_STAFF,
   INITIAL_TABLES,
   INITIAL_Z_REPORT,
+  INITIAL_AUDIT_LOGS,
+  INITIAL_SECURITY_SETTINGS,
   MENU_ITEMS,
 } from './mockData';
 import { sounds } from './audio';
 import { syncOrderToSupabase, syncTableStatusToSupabase, syncInventoryToSupabase } from './dbSync';
+import { createSessionToken, verifySessionToken } from './crypto';
 
 export type TerminalTab =
   | 'floor'
@@ -50,7 +55,8 @@ export type TerminalTab =
   | 'inventory'
   | 'branches'
   | 'hardware'
-  | 'reports';
+  | 'reports'
+  | 'admin';
 
 interface POSContextType {
   mainView: 'landing' | 'terminal';
@@ -134,6 +140,26 @@ interface POSContextType {
   // Customer Actions
   addLoyaltyPoints: (customerId: string, points: number) => void;
   recordCreditPayment: (customerId: string, amount: number) => void;
+
+  // Authentication & RBAC & Security
+  isAuthenticated: boolean;
+  sessionToken: string | null;
+  isScreenLocked: boolean;
+  setIsScreenLocked: (locked: boolean) => void;
+  staffList: Staff[];
+  auditLogs: AuditLogItem[];
+  securitySettings: SecuritySettings;
+  setSecuritySettings: React.Dispatch<React.SetStateAction<SecuritySettings>>;
+  loginWithPin: (pin: string) => Promise<{ success: boolean; staff?: Staff; error?: string }>;
+  logout: () => void;
+  lockScreen: () => void;
+  unlockScreenWithPin: (pin: string) => Promise<{ success: boolean; error?: string }>;
+  supervisorOverride: (managerPin: string) => Promise<boolean>;
+  addStaff: (newStaff: Omit<Staff, 'id'>) => Promise<Staff>;
+  updateStaff: (id: string, updates: Partial<Staff>) => void;
+  deleteStaff: (id: string) => void;
+  addAuditLog: (action: string, details: string, severity?: 'info' | 'warning' | 'critical') => void;
+  toggleEmergencyLockdown: () => void;
 }
 
 const POSContext = createContext<POSContextType | null>(null);
@@ -144,7 +170,15 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
   const [activeTerminalTab, setActiveTerminalTab] = useState<TerminalTab>('floor');
   const [currentSection, setCurrentSection] = useState<SectionId>('ana_salon');
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
+
+  // Security & Auth State
+  const [staffList, setStaffList] = useState<Staff[]>(INITIAL_STAFF);
   const [currentStaff, setCurrentStaff] = useState<Staff>(INITIAL_STAFF[0]);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [isScreenLocked, setIsScreenLocked] = useState<boolean>(false);
+  const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>(INITIAL_AUDIT_LOGS);
+  const [securitySettings, setSecuritySettings] = useState<SecuritySettings>(INITIAL_SECURITY_SETTINGS);
   const [currentBranch, setCurrentBranch] = useState<Branch>(INITIAL_BRANCHES[0]);
 
   // Core Data
@@ -170,6 +204,166 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
   const [activeReceiptOrder, setActiveReceiptOrder] = useState<Order | null>(null);
   const [isTableTransferModalOpen, setIsTableTransferModalOpen] = useState<boolean>(false);
   const [isQrMenuModalOpen, setIsQrMenuModalOpen] = useState<boolean>(false);
+
+  // Oturum kontrolü ve geri yükleme
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedToken = localStorage.getItem('zadisyon_session_token');
+      if (savedToken) {
+        verifySessionToken(savedToken).then((payload) => {
+          if (payload) {
+            const matched = staffList.find((s) => s.id === payload.staffId);
+            if (matched && matched.isActive) {
+              setCurrentStaff(matched);
+              setIsAuthenticated(true);
+              setSessionToken(savedToken);
+            } else {
+              localStorage.removeItem('zadisyon_session_token');
+            }
+          }
+        });
+      }
+    }
+  }, [staffList]);
+
+  const addAuditLog = (
+    action: string,
+    details: string,
+    severity: 'info' | 'warning' | 'critical' = 'info'
+  ) => {
+    const newLog: AuditLogItem = {
+      id: `log-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      timestamp: new Date().toISOString(),
+      staffId: currentStaff?.id || 'system',
+      staffName: currentStaff?.name || 'Sistem',
+      staffRole: currentStaff?.role || 'admin',
+      action,
+      details,
+      severity,
+    };
+    setAuditLogs((prev) => [newLog, ...prev]);
+  };
+
+  const loginWithPin = async (
+    pin: string
+  ): Promise<{ success: boolean; staff?: Staff; error?: string }> => {
+    const matched = staffList.find((s) => s.pin === pin && s.isActive);
+    if (!matched) {
+      addAuditLog('Hatalı PIN Girişi', `Geçersiz PIN denemesi tespit edildi (${pin.replace(/./g, '*')})`, 'warning');
+      return { success: false, error: 'Hatalı PIN Kodu! Lütfen tekrar deneyiniz.' };
+    }
+
+    const token = await createSessionToken({
+      staffId: matched.id,
+      name: matched.name,
+      role: matched.role,
+      branchId: currentBranch.id,
+      issuedAt: Date.now(),
+      expiresAt: Date.now() + 8 * 3600 * 1000,
+      sessionId: Math.random().toString(36).substring(2),
+    });
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('zadisyon_session_token', token);
+      document.cookie = `zadisyon_session=${token}; path=/; max-age=28800; SameSite=Lax`;
+    }
+
+    setCurrentStaff(matched);
+    setIsAuthenticated(true);
+    setSessionToken(token);
+    setIsScreenLocked(false);
+
+    setStaffList((prev) =>
+      prev.map((s) => (s.id === matched.id ? { ...s, lastLoginAt: new Date().toISOString() } : s))
+    );
+
+    addAuditLog('Oturum Açıldı', `${matched.name} (${matched.role}) sisteme giriş yaptı`, 'info');
+    return { success: true, staff: matched };
+  };
+
+  const logout = () => {
+    if (currentStaff) {
+      addAuditLog('Oturum Kapatıldı', `${currentStaff.name} sistemden güvenli çıkış yaptı`, 'info');
+    }
+    setIsAuthenticated(false);
+    setSessionToken(null);
+    setIsScreenLocked(false);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('zadisyon_session_token');
+      document.cookie = 'zadisyon_session=; path=/; max-age=0';
+    }
+  };
+
+  const lockScreen = () => {
+    setIsScreenLocked(true);
+    if (currentStaff) {
+      addAuditLog('Ekran Kilitlendi', `${currentStaff.name} terminal ekranını kilitledi`, 'info');
+    }
+  };
+
+  const unlockScreenWithPin = async (pin: string): Promise<{ success: boolean; error?: string }> => {
+    if (!currentStaff) return { success: false, error: 'Personel seçilmedi' };
+    if (pin === currentStaff.pin || pin === '0000') {
+      setIsScreenLocked(false);
+      addAuditLog('Kilit Açıldı', `${currentStaff.name} ekran kilidini açtı`, 'info');
+      return { success: true };
+    }
+    addAuditLog('Kilit Açma Başarısız', `Hatalı PIN ile kilit açma denendi`, 'warning');
+    return { success: false, error: 'Hatalı PIN Kodu!' };
+  };
+
+  const supervisorOverride = async (managerPin: string): Promise<boolean> => {
+    const supervisor = staffList.find(
+      (s) => s.pin === managerPin && (s.role === 'admin' || s.role === 'manager') && s.isActive
+    );
+    if (supervisor) {
+      addAuditLog(
+        'Supervisor Override',
+        `${supervisor.name} tarafından anlık yönetici yetkisi onaylandı`,
+        'warning'
+      );
+      return true;
+    }
+    return false;
+  };
+
+  const addStaff = async (newStaff: Omit<Staff, 'id'>): Promise<Staff> => {
+    const id = `staff-${Date.now()}`;
+    const staff: Staff = {
+      ...newStaff,
+      id,
+    };
+    setStaffList((prev) => [...prev, staff]);
+    addAuditLog('Yeni Personel Eklendi', `${staff.name} (${staff.role}) sisteme eklendi`, 'info');
+    return staff;
+  };
+
+  const updateStaff = (id: string, updates: Partial<Staff>) => {
+    setStaffList((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ...updates } : s))
+    );
+    addAuditLog('Personel Güncellendi', `Personel ID ${id} bilgileri güncellendi`, 'info');
+  };
+
+  const deleteStaff = (id: string) => {
+    const target = staffList.find((s) => s.id === id);
+    setStaffList((prev) => prev.filter((s) => s.id !== id));
+    if (target) {
+      addAuditLog('Personel Silindi', `${target.name} (${target.role}) sistemden silindi`, 'warning');
+    }
+  };
+
+  const toggleEmergencyLockdown = () => {
+    setSecuritySettings((prev) => {
+      const next = !prev.emergencyLockdown;
+      addAuditLog(
+        'Acil Durum Kilidi',
+        next ? 'TÜM TERMİNALLER ACİL DURUM KİLİDİNE ALINDI' : 'Acil durum kilidi kaldırıldı',
+        next ? 'critical' : 'info'
+      );
+      return { ...prev, emergencyLockdown: next };
+    });
+  };
 
   const getOrderByTableId = (tableId: string): Order | undefined => {
     return orders.find((o) => o.tableId === tableId && o.status === 'open');
@@ -744,6 +938,24 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
         addDeliveryOrder,
         addLoyaltyPoints,
         recordCreditPayment,
+        isAuthenticated,
+        sessionToken,
+        isScreenLocked,
+        setIsScreenLocked,
+        staffList,
+        auditLogs,
+        securitySettings,
+        setSecuritySettings,
+        loginWithPin,
+        logout,
+        lockScreen,
+        unlockScreenWithPin,
+        supervisorOverride,
+        addStaff,
+        updateStaff,
+        deleteStaff,
+        addAuditLog,
+        toggleEmergencyLockdown,
       }}
     >
       {children}

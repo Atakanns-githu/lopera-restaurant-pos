@@ -126,12 +126,43 @@ export interface Recipe {
   ingredients: RecipeIngredient[];
 }
 
+export type StaffRole = 'admin' | 'manager' | 'cashier' | 'chef' | 'waiter' | 'courier';
+
 export interface Staff {
   id: string;
   name: string;
-  pin: string;
-  role: 'waiter' | 'cashier' | 'chef' | 'manager';
+  pin: string; // 4 haneli PIN
+  hashedPin?: string; // SHA-256 hash
+  salt?: string;
+  role: StaffRole;
   avatarBg: string;
+  email?: string;
+  phone?: string;
+  isActive: boolean;
+  lastLoginAt?: string;
+  branchId?: string;
+}
+
+export interface AuditLogItem {
+  id: string;
+  timestamp: string;
+  staffId: string;
+  staffName: string;
+  staffRole: StaffRole;
+  action: string;
+  details: string;
+  severity: 'info' | 'warning' | 'critical';
+  ipAddress?: string;
+}
+
+export interface SecuritySettings {
+  emergencyLockdown: boolean;
+  sessionTimeoutMinutes: number;
+  maxFailedAttempts: number;
+  vukStatus: 'live' | 'test';
+  vatFoodRate: number;
+  vatDrinkRate: number;
+  defaultCoverCharge: number;
 }
 
 export interface ZReport {
