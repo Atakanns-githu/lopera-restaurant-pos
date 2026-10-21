@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "L'OPÉRA Bistro & Lounge | Restoran & Adisyon İşletim Sistemi",
-  description: "3D İnteraktif Kat Planı, POS Adisyon Motoru, Canlı KDS ve Mali Raporlama Restoran Yönetim Sistemi",
+  title: "ZAdisyon | Zynox Restoran & POS Teknolojileri",
+  description: "Zynox Yeni Nesil Restoran Adisyon, Mutfak KDS, Paket Servis, Kurye Takip, QR Menü ve Mali e-Adisyon Ekosistemi",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

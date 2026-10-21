@@ -26,8 +26,6 @@ export default function FloorPlan2D() {
     clearTable,
     setIsTableTransferModalOpen,
     setSelectedTableId,
-    viewMode,
-    setViewMode,
   } = usePOS();
 
   const sectionTables = tables.filter((t) => t.section === currentSection);
@@ -97,30 +95,17 @@ export default function FloorPlan2D() {
           ))}
         </div>
 
-        {/* View mode toggle */}
-        <div className="flex items-center p-1 rounded-2xl bg-[#121622] border border-stone-800">
-          <button
-            onClick={() => {
-              sounds.playTap();
-              setViewMode('3d');
-            }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              viewMode === '3d' ? 'bg-amber-500 text-stone-950' : 'text-stone-300 hover:text-white'
-            }`}
-          >
-            3D İzometrik
-          </button>
-          <button
-            onClick={() => {
-              sounds.playTap();
-              setViewMode('2d');
-            }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              viewMode === '2d' ? 'bg-amber-500 text-stone-950' : 'text-stone-300 hover:text-white'
-            }`}
-          >
-            2D Hızlı Liste
-          </button>
+        {/* Live Status Indicators */}
+        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-[#121622] border border-stone-800 text-xs font-mono">
+          <span className="px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
+            {sectionTables.filter((t) => t.status === 'occupied').length} Dolu
+          </span>
+          <span className="px-2.5 py-1 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold">
+            {sectionTables.filter((t) => t.status === 'bill_requested').length} Hesap
+          </span>
+          <span className="px-2.5 py-1 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+            {sectionTables.filter((t) => t.status === 'empty').length} Boş
+          </span>
         </div>
       </div>
 

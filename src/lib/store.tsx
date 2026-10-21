@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import {
   Category,
   InventoryItem,
@@ -16,9 +16,19 @@ import {
   TableItem,
   TableStatus,
   ZReport,
+  DeliveryOrder,
+  Courier,
+  Customer,
+  Branch,
+  HardwareDevice,
 } from '@/types/pos';
 import {
   CATEGORIES,
+  INITIAL_BRANCHES,
+  INITIAL_COURIERS,
+  INITIAL_CUSTOMERS,
+  INITIAL_DELIVERY_ORDERS,
+  INITIAL_HARDWARE,
   INITIAL_INVENTORY,
   INITIAL_ORDERS,
   INITIAL_RECIPES,
@@ -29,17 +39,32 @@ import {
 } from './mockData';
 import { sounds } from './audio';
 
+export type TerminalTab =
+  | 'floor'
+  | 'pos'
+  | 'kds'
+  | 'delivery'
+  | 'courier'
+  | 'crm'
+  | 'inventory'
+  | 'branches'
+  | 'hardware'
+  | 'reports';
+
 interface POSContextType {
-  activeTab: 'floor' | 'pos' | 'kds' | 'inventory' | 'reports';
-  setActiveTab: (tab: 'floor' | 'pos' | 'kds' | 'inventory' | 'reports') => void;
+  mainView: 'landing' | 'terminal';
+  setMainView: (view: 'landing' | 'terminal') => void;
+  activeTerminalTab: TerminalTab;
+  setActiveTerminalTab: (tab: TerminalTab) => void;
   currentSection: SectionId;
   setCurrentSection: (section: SectionId) => void;
-  viewMode: '3d' | '2d';
-  setViewMode: (mode: '3d' | '2d') => void;
   selectedTableId: string | null;
   setSelectedTableId: (id: string | null) => void;
   currentStaff: Staff;
   setCurrentStaff: (staff: Staff) => void;
+  currentBranch: Branch;
+  setCurrentBranch: (branch: Branch) => void;
+
   tables: TableItem[];
   orders: Order[];
   categories: Category[];
@@ -47,6 +72,11 @@ interface POSContextType {
   inventory: InventoryItem[];
   recipes: Recipe[];
   zReports: ZReport[];
+  deliveryOrders: DeliveryOrder[];
+  couriers: Courier[];
+  customers: Customer[];
+  branches: Branch[];
+  hardwareDevices: HardwareDevice[];
 
   // Modals
   isPinModalOpen: boolean;
@@ -59,6 +89,8 @@ interface POSContextType {
   setActiveReceiptOrder: (order: Order | null) => void;
   isTableTransferModalOpen: boolean;
   setIsTableTransferModalOpen: (open: boolean) => void;
+  isQrMenuModalOpen: boolean;
+  setIsQrMenuModalOpen: (open: boolean) => void;
 
   // Actions
   selectTableAndOpenPOS: (tableId: string) => void;
@@ -92,17 +124,29 @@ interface POSContextType {
   clearTable: (tableId: string) => void;
   updateInventoryStock: (itemId: string, newStock: number) => void;
   generateNewZReport: () => ZReport;
+
+  // Delivery & Courier Actions
+  updateDeliveryStatus: (id: string, status: DeliveryOrder['status']) => void;
+  assignCourier: (orderId: string, courierName: string) => void;
+  addDeliveryOrder: (order: Partial<DeliveryOrder>) => void;
+
+  // Customer Actions
+  addLoyaltyPoints: (customerId: string, points: number) => void;
+  recordCreditPayment: (customerId: string, amount: number) => void;
 }
 
 const POSContext = createContext<POSContextType | null>(null);
 
 export function POSProvider({ children }: { children: React.ReactNode }) {
-  const [activeTab, setActiveTab] = useState<'floor' | 'pos' | 'kds' | 'inventory' | 'reports'>('floor');
+  // Navigation
+  const [mainView, setMainView] = useState<'landing' | 'terminal'>('landing');
+  const [activeTerminalTab, setActiveTerminalTab] = useState<TerminalTab>('floor');
   const [currentSection, setCurrentSection] = useState<SectionId>('ana_salon');
-  const [viewMode, setViewMode] = useState<'3d' | '2d'>('3d');
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [currentStaff, setCurrentStaff] = useState<Staff>(INITIAL_STAFF[0]);
+  const [currentBranch, setCurrentBranch] = useState<Branch>(INITIAL_BRANCHES[0]);
 
+  // Core Data
   const [tables, setTables] = useState<TableItem[]>(INITIAL_TABLES);
   const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
   const [categories] = useState<Category[]>(CATEGORIES);
@@ -111,21 +155,28 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
   const [recipes] = useState<Recipe[]>(INITIAL_RECIPES);
   const [zReports, setZReports] = useState<ZReport[]>([INITIAL_Z_REPORT]);
 
-  // Modals state
+  // Extended Data (from Screenshots)
+  const [deliveryOrders, setDeliveryOrders] = useState<DeliveryOrder[]>(INITIAL_DELIVERY_ORDERS);
+  const [couriers, setCouriers] = useState<Courier[]>(INITIAL_COURIERS);
+  const [customers, setCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS);
+  const [branches] = useState<Branch[]>(INITIAL_BRANCHES);
+  const [hardwareDevices] = useState<HardwareDevice[]>(INITIAL_HARDWARE);
+
+  // Modals
   const [isPinModalOpen, setIsPinModalOpen] = useState<boolean>(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false);
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState<boolean>(false);
   const [activeReceiptOrder, setActiveReceiptOrder] = useState<Order | null>(null);
   const [isTableTransferModalOpen, setIsTableTransferModalOpen] = useState<boolean>(false);
+  const [isQrMenuModalOpen, setIsQrMenuModalOpen] = useState<boolean>(false);
 
-  // Sync tables currentOrderId
   const getOrderByTableId = (tableId: string): Order | undefined => {
     return orders.find((o) => o.tableId === tableId && o.status === 'open');
   };
 
   const selectTableAndOpenPOS = (tableId: string) => {
     setSelectedTableId(tableId);
-    setActiveTab('pos');
+    setActiveTerminalTab('pos');
     sounds.playTap();
   };
 
@@ -189,7 +240,6 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
 
       setOrders((prev) => prev.map((o) => (o.id === updatedOrder.id ? updatedOrder : o)));
     } else {
-      // Create new order
       const coverCharge = (table.capacity || 2) * 80;
       const { subtotal, discountAmount, total } = calculateOrderTotals([newItem], 0, coverCharge);
 
@@ -217,7 +267,6 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
 
       setOrders((prev) => [...prev, newOrder]);
 
-      // Update table status to occupied
       setTables((prev) =>
         prev.map((t) =>
           t.id === tableId
@@ -380,7 +429,6 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  // Recipe-based inventory deduction
   const deductInventoryFromOrder = (order: Order) => {
     setInventory((prevInv) => {
       const invCopy = [...prevInv];
@@ -443,7 +491,6 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
       sounds.playPaymentSuccess();
       deductInventoryFromOrder(updatedOrder);
 
-      // Free table
       setTables((prev) =>
         prev.map((t) =>
           t.id === order.tableId
@@ -458,7 +505,6 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
         )
       );
 
-      // Auto trigger receipt modal
       setActiveReceiptOrder(updatedOrder);
       setIsReceiptModalOpen(true);
     } else {
@@ -581,19 +627,73 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
     return newReport;
   };
 
+  // Delivery & Courier Actions
+  const updateDeliveryStatus = (id: string, status: DeliveryOrder['status']) => {
+    sounds.playTap();
+    setDeliveryOrders((prev) =>
+      prev.map((o) => (o.id === id ? { ...o, status } : o))
+    );
+  };
+
+  const assignCourier = (orderId: string, courierName: string) => {
+    sounds.playTap();
+    setDeliveryOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, courierName, status: 'on_the_way' } : o))
+    );
+    setCouriers((prev) =>
+      prev.map((c) => (c.name === courierName ? { ...c, status: 'delivering', activeDeliveryId: orderId } : c))
+    );
+  };
+
+  const addDeliveryOrder = (order: Partial<DeliveryOrder>) => {
+    sounds.playAddItem();
+    const newOrder: DeliveryOrder = {
+      id: 'del-' + Math.random().toString(36).substring(2, 8),
+      orderNumber: 'PK-' + Math.floor(1000 + Math.random() * 9000),
+      platform: order.platform || 'phone',
+      customerName: order.customerName || 'Yeni Müşteri',
+      customerPhone: order.customerPhone || '0555 000 00 00',
+      deliveryAddress: order.deliveryAddress || 'İstanbul Adresi',
+      items: order.items || [{ name: 'Pizza Tartufata & Bresaola', quantity: 1, price: 640 }],
+      total: order.total || 640,
+      paymentType: order.paymentType || 'Online Kredi Kartı',
+      status: 'preparing',
+      createdAt: new Date().toISOString(),
+      estimatedDeliveryMinutes: 30,
+    };
+    setDeliveryOrders((prev) => [newOrder, ...prev]);
+  };
+
+  // CRM Actions
+  const addLoyaltyPoints = (customerId: string, points: number) => {
+    sounds.playTap();
+    setCustomers((prev) =>
+      prev.map((c) => (c.id === customerId ? { ...c, loyaltyPoints: c.loyaltyPoints + points } : c))
+    );
+  };
+
+  const recordCreditPayment = (customerId: string, amount: number) => {
+    sounds.playPaymentSuccess();
+    setCustomers((prev) =>
+      prev.map((c) => (c.id === customerId ? { ...c, creditBalance: Math.max(0, c.creditBalance - amount) } : c))
+    );
+  };
+
   return (
     <POSContext.Provider
       value={{
-        activeTab,
-        setActiveTab,
+        mainView,
+        setMainView,
+        activeTerminalTab,
+        setActiveTerminalTab,
         currentSection,
         setCurrentSection,
-        viewMode,
-        setViewMode,
         selectedTableId,
         setSelectedTableId,
         currentStaff,
         setCurrentStaff,
+        currentBranch,
+        setCurrentBranch,
         tables,
         orders,
         categories,
@@ -601,6 +701,11 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
         inventory,
         recipes,
         zReports,
+        deliveryOrders,
+        couriers,
+        customers,
+        branches,
+        hardwareDevices,
         isPinModalOpen,
         setIsPinModalOpen,
         isPaymentModalOpen,
@@ -611,6 +716,8 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
         setActiveReceiptOrder,
         isTableTransferModalOpen,
         setIsTableTransferModalOpen,
+        isQrMenuModalOpen,
+        setIsQrMenuModalOpen,
         selectTableAndOpenPOS,
         getOrderByTableId,
         addItemToTableOrder,
@@ -626,6 +733,11 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
         clearTable,
         updateInventoryStock,
         generateNewZReport,
+        updateDeliveryStatus,
+        assignCourier,
+        addDeliveryOrder,
+        addLoyaltyPoints,
+        recordCreditPayment,
       }}
     >
       {children}

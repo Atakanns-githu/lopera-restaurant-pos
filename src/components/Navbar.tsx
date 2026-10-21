@@ -15,19 +15,28 @@ import {
   Clock,
   Sparkles,
   RefreshCw,
+  Truck,
+  Bike,
+  Users,
+  Building2,
+  Cpu,
+  ArrowLeft,
+  ChevronDown,
 } from 'lucide-react';
+import { TerminalTab } from '@/lib/store';
 
 export default function Navbar() {
   const {
-    activeTab,
-    setActiveTab,
+    activeTerminalTab,
+    setActiveTerminalTab,
+    setMainView,
     currentStaff,
     setIsPinModalOpen,
     orders,
     inventory,
-    tables,
-    clearTable,
-    selectedTableId,
+    deliveryOrders,
+    couriers,
+    currentBranch,
   } = usePOS();
 
   const [time, setTime] = useState<string>('');
@@ -61,144 +70,158 @@ export default function Navbar() {
     .flatMap((o) => o.items)
     .filter((i) => i.status === 'pending' || i.status === 'preparing').length;
   const criticalStockCount = inventory.filter((i) => i.currentStock <= i.criticalStock).length;
+  const activeDeliveryCount = deliveryOrders.filter(
+    (d) => d.status === 'pending' || d.status === 'preparing' || d.status === 'on_the_way'
+  ).length;
+
+  const tabs: { id: TerminalTab; label: string; icon: React.ReactNode; badge?: React.ReactNode }[] = [
+    {
+      id: 'floor',
+      label: 'Kat & Masa Planı',
+      icon: <Layers className="w-4 h-4" />,
+    },
+    {
+      id: 'pos',
+      label: 'Hızlı POS',
+      icon: <CreditCard className="w-4 h-4" />,
+      badge: activeOrdersCount > 0 ? (
+        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500 text-stone-950 font-bold">
+          {activeOrdersCount}
+        </span>
+      ) : null,
+    },
+    {
+      id: 'kds',
+      label: 'Mutfak KDS',
+      icon: <ChefHat className="w-4 h-4" />,
+      badge: kdsPendingCount > 0 ? (
+        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500 text-white font-bold animate-pulse">
+          {kdsPendingCount}
+        </span>
+      ) : null,
+    },
+    {
+      id: 'delivery',
+      label: 'Paket Servis',
+      icon: <Truck className="w-4 h-4" />,
+      badge: activeDeliveryCount > 0 ? (
+        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-blue-500 text-white font-bold">
+          {activeDeliveryCount}
+        </span>
+      ) : null,
+    },
+    {
+      id: 'courier',
+      label: 'Kurye Takip',
+      icon: <Bike className="w-4 h-4" />,
+    },
+    {
+      id: 'crm',
+      label: 'Cari & Sadakat',
+      icon: <Users className="w-4 h-4" />,
+    },
+    {
+      id: 'inventory',
+      label: 'Stok & Reçete',
+      icon: <Boxes className="w-4 h-4" />,
+      badge: criticalStockCount > 0 ? (
+        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-red-600 text-white font-bold">
+          !
+        </span>
+      ) : null,
+    },
+    {
+      id: 'branches',
+      label: 'Zincir Şubeler',
+      icon: <Building2 className="w-4 h-4" />,
+    },
+    {
+      id: 'hardware',
+      label: 'Donanım & E-Dönüşüm',
+      icon: <Cpu className="w-4 h-4" />,
+    },
+    {
+      id: 'reports',
+      label: 'Z-Raporu & Finans',
+      icon: <FileSpreadsheet className="w-4 h-4" />,
+    },
+  ];
 
   return (
-    <header className="bg-[#0e111a] border-b border-[#1e2433] px-4 py-2.5 flex items-center justify-between sticky top-0 z-40 select-none shadow-xl">
-      {/* Brand & Concept */}
+    <header className="bg-[#0e111a] border-b border-[#1e2433] px-3 py-2 flex items-center justify-between sticky top-0 z-40 select-none shadow-xl">
+      {/* Brand & Concept & Back to Website */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/20 border border-amber-400/30">
-          <Sparkles className="w-5 h-5 text-stone-950 font-bold" />
-        </div>
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="font-serif tracking-wider text-base font-bold text-stone-100 flex items-center gap-1.5">
-              <span>L’OPÉRA</span>
-              <span className="text-amber-400 text-xs font-sans tracking-normal font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
-                FINE DINING & LOUNGE
-              </span>
-            </h1>
+        <button
+          onClick={() => {
+            sounds.playTap();
+            setMainView('landing');
+          }}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#141824] hover:bg-[#1a2032] border border-stone-800 text-stone-300 hover:text-amber-400 text-xs font-semibold transition-all group"
+          title="Müşteri ve Marka Tanıtım Sayfasına Dön"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          <span className="hidden sm:inline">Marka Sitesi</span>
+        </button>
+
+        <div className="flex items-center gap-2.5 pl-2 border-l border-stone-800">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/20 border border-amber-400/30">
+            <span className="font-serif font-black text-sm text-stone-950">Z</span>
           </div>
-          <p className="text-[11px] text-stone-400 font-mono tracking-tight">
-            Restoran & Adisyon İşletim Sistemi v2.4
-          </p>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <h1 className="font-serif tracking-wider text-xs font-bold text-stone-100">
+                ZADİSYON
+              </h1>
+              <span className="text-amber-400 text-[10px] font-sans font-semibold px-1.5 py-0.2 rounded bg-amber-500/10 border border-amber-500/20">
+                {currentBranch.name}
+              </span>
+            </div>
+            <p className="text-[10px] text-stone-400 font-mono tracking-tight">
+              Zynox POS OS v3.2
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Main Module Tabs */}
-      <nav className="flex items-center gap-1.5 bg-[#090b10] p-1 rounded-xl border border-stone-800/80 shadow-inner">
-        <button
-          onClick={() => {
-            sounds.playTap();
-            setActiveTab('floor');
-          }}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all ${
-            activeTab === 'floor'
-              ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20'
-              : 'text-stone-300 hover:text-white hover:bg-stone-800/50'
-          }`}
-        >
-          <Layers className="w-4 h-4" />
-          <span>Kat & Masa Planı</span>
-          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-black/20 text-stone-950 font-mono font-bold">
-            3D
-          </span>
-        </button>
+      {/* Main Module Tabs Navigation (Scrollable horizontally if needed) */}
+      <nav className="flex items-center gap-1 bg-[#090b10] p-1 rounded-xl border border-stone-800/80 shadow-inner overflow-x-auto max-w-[62vw] custom-scrollbar">
+        {tabs.map((tab) => {
+          const isActive = activeTerminalTab === tab.id;
 
-        <button
-          onClick={() => {
-            sounds.playTap();
-            setActiveTab('pos');
-          }}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all relative ${
-            activeTab === 'pos'
-              ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20'
-              : 'text-stone-300 hover:text-white hover:bg-stone-800/50'
-          }`}
-        >
-          <CreditCard className="w-4 h-4" />
-          <span>Hızlı POS & Adisyon</span>
-          {activeOrdersCount > 0 && (
-            <span
-              className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                activeTab === 'pos'
-                  ? 'bg-stone-950 text-amber-400'
-                  : 'bg-amber-500 text-stone-950 shadow-sm'
+          return (
+            <button
+              key={tab.id}
+              onClick={() => {
+                sounds.playTap();
+                setActiveTerminalTab(tab.id);
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+                isActive
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20'
+                  : 'text-stone-300 hover:text-white hover:bg-stone-800/50'
               }`}
             >
-              {activeOrdersCount}
-            </span>
-          )}
-        </button>
-
-        <button
-          onClick={() => {
-            sounds.playTap();
-            setActiveTab('kds');
-          }}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all relative ${
-            activeTab === 'kds'
-              ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20'
-              : 'text-stone-300 hover:text-white hover:bg-stone-800/50'
-          }`}
-        >
-          <ChefHat className="w-4 h-4" />
-          <span>Mutfak & Bar KDS</span>
-          {kdsPendingCount > 0 && (
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500 text-white font-bold animate-pulse">
-              {kdsPendingCount}
-            </span>
-          )}
-        </button>
-
-        <button
-          onClick={() => {
-            sounds.playTap();
-            setActiveTab('inventory');
-          }}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all relative ${
-            activeTab === 'inventory'
-              ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20'
-              : 'text-stone-300 hover:text-white hover:bg-stone-800/50'
-          }`}
-        >
-          <Boxes className="w-4 h-4" />
-          <span>Stok & Reçete</span>
-          {criticalStockCount > 0 && (
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-red-600 text-white font-bold">
-              !
-            </span>
-          )}
-        </button>
-
-        <button
-          onClick={() => {
-            sounds.playTap();
-            setActiveTab('reports');
-          }}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all ${
-            activeTab === 'reports'
-              ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20'
-              : 'text-stone-300 hover:text-white hover:bg-stone-800/50'
-          }`}
-        >
-          <FileSpreadsheet className="w-4 h-4" />
-          <span>Z-Raporu & Finans</span>
-        </button>
+              {tab.icon}
+              <span>{tab.label}</span>
+              {tab.badge}
+            </button>
+          );
+        })}
       </nav>
 
       {/* Right Controls: Clock, Sound, Staff PIN Switcher */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         {/* Clock */}
-        <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#141824] border border-stone-800/80 text-stone-300 font-mono text-xs">
+        <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#141824] border border-stone-800/80 text-stone-300 font-mono text-xs">
           <Clock className="w-3.5 h-3.5 text-amber-400" />
-          <span>{time || '18:30:00'}</span>
+          <span>{time || '19:45:00'}</span>
         </div>
 
         {/* Audio Mute Toggle */}
         <button
           onClick={toggleSound}
           title={isMuted ? 'Sesi Aç' : 'Sesi Kapat'}
-          className="p-2 rounded-lg bg-[#141824] border border-stone-800 text-stone-300 hover:text-white hover:border-stone-700 transition-colors"
+          className="p-1.5 rounded-lg bg-[#141824] border border-stone-800 text-stone-300 hover:text-white hover:border-stone-700 transition-colors"
         >
           {isMuted ? (
             <VolumeX className="w-4 h-4 text-rose-400" />
@@ -213,22 +236,22 @@ export default function Navbar() {
             sounds.playTap();
             setIsPinModalOpen(true);
           }}
-          className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-xl bg-[#141824] border border-stone-800 hover:border-amber-500/40 transition-all text-left group"
+          className="flex items-center gap-2 pl-2 pr-2.5 py-1.5 rounded-xl bg-[#141824] border border-stone-800 hover:border-amber-500/40 transition-all text-left group"
         >
           <div
-            className={`w-7 h-7 rounded-lg ${currentStaff.avatarBg} text-white flex items-center justify-center font-bold text-xs shadow-sm`}
+            className={`w-6 h-6 rounded-lg ${currentStaff.avatarBg} text-white flex items-center justify-center font-bold text-xs shadow-sm`}
           >
             {currentStaff.name.charAt(0)}
           </div>
           <div className="hidden sm:block">
-            <div className="text-xs font-semibold text-stone-200 group-hover:text-amber-400 transition-colors flex items-center gap-1">
-              <span>{currentStaff.name}</span>
+            <div className="text-xs font-semibold text-stone-200 group-hover:text-amber-400 transition-colors">
+              {currentStaff.name}
             </div>
-            <div className="text-[10px] text-stone-400 capitalize">
+            <div className="text-[9px] text-stone-400 capitalize">
               {currentStaff.role === 'waiter' && 'Garson'}
               {currentStaff.role === 'cashier' && 'Kasiyer'}
               {currentStaff.role === 'chef' && 'Mutfak Şefi'}
-              {currentStaff.role === 'manager' && 'Restoran Müdürü'}
+              {currentStaff.role === 'manager' && 'Müdür'}
             </div>
           </div>
         </button>

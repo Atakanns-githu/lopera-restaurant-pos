@@ -7,7 +7,12 @@ import {
   SectionId,
   Staff,
   TableItem,
-  ZReport
+  ZReport,
+  DeliveryOrder,
+  Courier,
+  Customer,
+  Branch,
+  HardwareDevice
 } from '@/types/pos';
 
 export const SECTIONS: { id: SectionId; name: string; description: string; icon: string }[] = [
@@ -19,37 +24,37 @@ export const SECTIONS: { id: SectionId; name: string; description: string; icon:
 ];
 
 export const INITIAL_TABLES: TableItem[] = [
-  // Ana Salon (Main Hall)
-  { id: 't-1', tableNumber: 'A-1', name: 'Masa A1', section: 'ana_salon', capacity: 2, status: 'occupied', posX: -6, posY: 0, posZ: -5, shape: 'round', seatedAt: new Date(Date.now() - 42 * 60000).toISOString(), guestCount: 2, waiterName: 'Caner Yıldız', currentOrderId: 'ord-101' },
-  { id: 't-2', tableNumber: 'A-2', name: 'Masa A2', section: 'ana_salon', capacity: 4, status: 'bill_requested', posX: -2, posY: 0, posZ: -5, shape: 'rect', seatedAt: new Date(Date.now() - 65 * 60000).toISOString(), guestCount: 4, waiterName: 'Caner Yıldız', currentOrderId: 'ord-102' },
-  { id: 't-3', tableNumber: 'A-3', name: 'Masa A3', section: 'ana_salon', capacity: 4, status: 'empty', posX: 2, posY: 0, posZ: -5, shape: 'rect' },
-  { id: 't-4', tableNumber: 'A-4', name: 'Masa A4', section: 'ana_salon', capacity: 6, status: 'reserved', posX: 6, posY: 0, posZ: -5, shape: 'rect', guestCount: 5 },
-  { id: 't-5', tableNumber: 'A-5', name: 'Masa A5', section: 'ana_salon', capacity: 2, status: 'empty', posX: -6, posY: 0, posZ: 0, shape: 'round' },
-  { id: 't-6', tableNumber: 'A-6', name: 'Masa A6', section: 'ana_salon', capacity: 4, status: 'occupied', posX: -2, posY: 0, posZ: 0, shape: 'rect', seatedAt: new Date(Date.now() - 18 * 60000).toISOString(), guestCount: 3, waiterName: 'Caner Yıldız', currentOrderId: 'ord-103' },
-  { id: 't-7', tableNumber: 'A-7', name: 'Masa A7', section: 'ana_salon', capacity: 4, status: 'empty', posX: 2, posY: 0, posZ: 0, shape: 'rect' },
-  { id: 't-8', tableNumber: 'A-8', name: 'Masa A8', section: 'ana_salon', capacity: 8, status: 'occupied', posX: 6, posY: 0, posZ: 0, shape: 'rect', seatedAt: new Date(Date.now() - 55 * 60000).toISOString(), guestCount: 7, waiterName: 'Caner Yıldız', currentOrderId: 'ord-104' },
+  // Ana Salon
+  { id: 't-1', tableNumber: 'A-1', name: 'Masa A1', section: 'ana_salon', capacity: 2, status: 'occupied', seatedAt: new Date(Date.now() - 42 * 60000).toISOString(), guestCount: 2, waiterName: 'Caner Yıldız', currentOrderId: 'ord-101' },
+  { id: 't-2', tableNumber: 'A-2', name: 'Masa A2', section: 'ana_salon', capacity: 4, status: 'bill_requested', seatedAt: new Date(Date.now() - 65 * 60000).toISOString(), guestCount: 4, waiterName: 'Caner Yıldız', currentOrderId: 'ord-102' },
+  { id: 't-3', tableNumber: 'A-3', name: 'Masa A3', section: 'ana_salon', capacity: 4, status: 'empty' },
+  { id: 't-4', tableNumber: 'A-4', name: 'Masa A4', section: 'ana_salon', capacity: 6, status: 'reserved', guestCount: 5 },
+  { id: 't-5', tableNumber: 'A-5', name: 'Masa A5', section: 'ana_salon', capacity: 2, status: 'empty' },
+  { id: 't-6', tableNumber: 'A-6', name: 'Masa A6', section: 'ana_salon', capacity: 4, status: 'occupied', seatedAt: new Date(Date.now() - 18 * 60000).toISOString(), guestCount: 3, waiterName: 'Caner Yıldız', currentOrderId: 'ord-103' },
+  { id: 't-7', tableNumber: 'A-7', name: 'Masa A7', section: 'ana_salon', capacity: 4, status: 'empty' },
+  { id: 't-8', tableNumber: 'A-8', name: 'Masa A8', section: 'ana_salon', capacity: 8, status: 'occupied', seatedAt: new Date(Date.now() - 55 * 60000).toISOString(), guestCount: 7, waiterName: 'Caner Yıldız', currentOrderId: 'ord-104' },
 
   // Teras
-  { id: 't-9', tableNumber: 'T-1', name: 'Teras T1', section: 'teras', capacity: 2, status: 'occupied', posX: -5, posY: 0, posZ: -4, shape: 'round', seatedAt: new Date(Date.now() - 25 * 60000).toISOString(), guestCount: 2, waiterName: 'Caner Yıldız', currentOrderId: 'ord-105' },
-  { id: 't-10', tableNumber: 'T-2', name: 'Teras T2', section: 'teras', capacity: 4, status: 'empty', posX: 0, posY: 0, posZ: -4, shape: 'rect' },
-  { id: 't-11', tableNumber: 'T-3', name: 'Teras T3', section: 'teras', capacity: 4, status: 'empty', posX: 5, posY: 0, posZ: -4, shape: 'rect' },
-  { id: 't-12', tableNumber: 'T-4', name: 'Teras T4', section: 'teras', capacity: 6, status: 'bill_requested', posX: -3, posY: 0, posZ: 3, shape: 'rect', seatedAt: new Date(Date.now() - 80 * 60000).toISOString(), guestCount: 5, waiterName: 'Caner Yıldız', currentOrderId: 'ord-106' },
-  { id: 't-13', tableNumber: 'T-5', name: 'Teras T5', section: 'teras', capacity: 4, status: 'empty', posX: 3, posY: 0, posZ: 3, shape: 'round' },
+  { id: 't-9', tableNumber: 'T-1', name: 'Teras T1', section: 'teras', capacity: 2, status: 'occupied', seatedAt: new Date(Date.now() - 25 * 60000).toISOString(), guestCount: 2, waiterName: 'Caner Yıldız', currentOrderId: 'ord-105' },
+  { id: 't-10', tableNumber: 'T-2', name: 'Teras T2', section: 'teras', capacity: 4, status: 'empty' },
+  { id: 't-11', tableNumber: 'T-3', name: 'Teras T3', section: 'teras', capacity: 4, status: 'empty' },
+  { id: 't-12', tableNumber: 'T-4', name: 'Teras T4', section: 'teras', capacity: 6, status: 'bill_requested', seatedAt: new Date(Date.now() - 80 * 60000).toISOString(), guestCount: 5, waiterName: 'Caner Yıldız', currentOrderId: 'ord-106' },
+  { id: 't-13', tableNumber: 'T-5', name: 'Teras T5', section: 'teras', capacity: 4, status: 'empty' },
 
   // VIP Lounge
-  { id: 't-14', tableNumber: 'VIP-1', name: 'Kral Locası', section: 'vip', capacity: 8, status: 'occupied', posX: -4, posY: 0, posZ: -2, shape: 'rect', seatedAt: new Date(Date.now() - 35 * 60000).toISOString(), guestCount: 6, waiterName: 'Caner Yıldız', currentOrderId: 'ord-107' },
-  { id: 't-15', tableNumber: 'VIP-2', name: 'Zümrüt Loca', section: 'vip', capacity: 6, status: 'reserved', posX: 4, posY: 0, posZ: -2, shape: 'rect', guestCount: 4 },
-  { id: 't-16', tableNumber: 'VIP-3', name: 'Safir Loca', section: 'vip', capacity: 6, status: 'empty', posX: 0, posY: 0, posZ: 4, shape: 'round' },
+  { id: 't-14', tableNumber: 'VIP-1', name: 'Kral Locası', section: 'vip', capacity: 8, status: 'occupied', seatedAt: new Date(Date.now() - 35 * 60000).toISOString(), guestCount: 6, waiterName: 'Caner Yıldız', currentOrderId: 'ord-107' },
+  { id: 't-15', tableNumber: 'VIP-2', name: 'Zümrüt Loca', section: 'vip', capacity: 6, status: 'reserved', guestCount: 4 },
+  { id: 't-16', tableNumber: 'VIP-3', name: 'Safir Loca', section: 'vip', capacity: 6, status: 'empty' },
 
   // Bahçe
-  { id: 't-17', tableNumber: 'B-1', name: 'Bahçe B1', section: 'bahce', capacity: 4, status: 'empty', posX: -5, posY: 0, posZ: -3, shape: 'round' },
-  { id: 't-18', tableNumber: 'B-2', name: 'Bahçe B2', section: 'bahce', capacity: 4, status: 'occupied', posX: 0, posY: 0, posZ: -3, shape: 'rect', seatedAt: new Date(Date.now() - 15 * 60000).toISOString(), guestCount: 4, waiterName: 'Caner Yıldız', currentOrderId: 'ord-108' },
-  { id: 't-19', tableNumber: 'B-3', name: 'Bahçe B3', section: 'bahce', capacity: 6, status: 'empty', posX: 5, posY: 0, posZ: -3, shape: 'rect' },
+  { id: 't-17', tableNumber: 'B-1', name: 'Bahçe B1', section: 'bahce', capacity: 4, status: 'empty' },
+  { id: 't-18', tableNumber: 'B-2', name: 'Bahçe B2', section: 'bahce', capacity: 4, status: 'occupied', seatedAt: new Date(Date.now() - 15 * 60000).toISOString(), guestCount: 4, waiterName: 'Caner Yıldız', currentOrderId: 'ord-108' },
+  { id: 't-19', tableNumber: 'B-3', name: 'Bahçe B3', section: 'bahce', capacity: 6, status: 'empty' },
 
   // Bar
-  { id: 't-20', tableNumber: 'BAR-1', name: 'Bar Stand 1', section: 'bar', capacity: 2, status: 'occupied', posX: -4, posY: 0, posZ: 0, shape: 'round', seatedAt: new Date(Date.now() - 10 * 60000).toISOString(), guestCount: 1, waiterName: 'Caner Yıldız', currentOrderId: 'ord-109' },
-  { id: 't-21', tableNumber: 'BAR-2', name: 'Bar Stand 2', section: 'bar', capacity: 2, status: 'empty', posX: 0, posY: 0, posZ: 0, shape: 'round' },
-  { id: 't-22', tableNumber: 'BAR-3', name: 'Bar Stand 3', section: 'bar', capacity: 2, status: 'occupied', posX: 4, posY: 0, posZ: 0, shape: 'round', seatedAt: new Date(Date.now() - 20 * 60000).toISOString(), guestCount: 2, waiterName: 'Caner Yıldız', currentOrderId: 'ord-110' },
+  { id: 't-20', tableNumber: 'BAR-1', name: 'Bar Stand 1', section: 'bar', capacity: 2, status: 'occupied', seatedAt: new Date(Date.now() - 10 * 60000).toISOString(), guestCount: 1, waiterName: 'Caner Yıldız', currentOrderId: 'ord-109' },
+  { id: 't-21', tableNumber: 'BAR-2', name: 'Bar Stand 2', section: 'bar', capacity: 2, status: 'empty' },
+  { id: 't-22', tableNumber: 'BAR-3', name: 'Bar Stand 3', section: 'bar', capacity: 2, status: 'occupied', seatedAt: new Date(Date.now() - 20 * 60000).toISOString(), guestCount: 2, waiterName: 'Caner Yıldız', currentOrderId: 'ord-110' },
 ];
 
 export const CATEGORIES: Category[] = [
@@ -63,7 +68,6 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const MENU_ITEMS: MenuItem[] = [
-  // Başlangıçlar
   {
     id: 'm-1',
     categoryId: 'cat-starters',
@@ -100,8 +104,6 @@ export const MENU_ITEMS: MenuItem[] = [
     allergens: ['Gluten', 'Süt Ürünü', 'Yumurta'],
     isAvailable: true,
   },
-
-  // Şefin Izgaraları & Ana Yemekler
   {
     id: 'm-4',
     categoryId: 'cat-mains',
@@ -158,8 +160,6 @@ export const MENU_ITEMS: MenuItem[] = [
     allergens: ['Balık', 'Süt Ürünü', 'Yumurta'],
     isAvailable: true,
   },
-
-  // Makarnalar & Risotto
   {
     id: 'm-7',
     categoryId: 'cat-pasta',
@@ -172,32 +172,6 @@ export const MENU_ITEMS: MenuItem[] = [
     allergens: ['Gluten', 'Süt Ürünü', 'Yumurta'],
     isAvailable: true,
   },
-  {
-    id: 'm-8',
-    categoryId: 'cat-pasta',
-    name: 'Deniz Mahsullü Linguine al Cartoccio',
-    description: 'Kaplan karides, kum midyesi, kalamar, sarımsak, taze kiraz domates ve beyaz şarap sosu',
-    price: 690,
-    station: 'hot_kitchen',
-    prepTimeMinutes: 16,
-    calories: 590,
-    allergens: ['Gluten', 'Kabuklular', 'Yumuşakçalar'],
-    isAvailable: true,
-  },
-  {
-    id: 'm-9',
-    categoryId: 'cat-pasta',
-    name: 'Safranlı Deniz Tarağı Risotto',
-    description: 'İran safranı ile demlenmiş carnaroli pirinci, tereyağında mühürlenmiş taze deniz tarağı',
-    price: 740,
-    station: 'hot_kitchen',
-    prepTimeMinutes: 18,
-    calories: 680,
-    allergens: ['Süt Ürünü', 'Yumuşakçalar'],
-    isAvailable: true,
-  },
-
-  // Pizza
   {
     id: 'm-10',
     categoryId: 'cat-pizza',
@@ -223,20 +197,6 @@ export const MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
   },
   {
-    id: 'm-12',
-    categoryId: 'cat-pizza',
-    name: 'Quattro Formaggi al Forno',
-    description: 'Fior di latte, gorgonzola piccante, füme provolone, parmesan ve organik kestane balı damlaları',
-    price: 570,
-    station: 'hot_kitchen',
-    prepTimeMinutes: 11,
-    calories: 880,
-    allergens: ['Gluten', 'Süt Ürünü'],
-    isAvailable: true,
-  },
-
-  // Kokteyller & İçecekler
-  {
     id: 'm-13',
     categoryId: 'cat-cocktails',
     name: 'Smoked Bourbon Old Fashioned',
@@ -248,40 +208,6 @@ export const MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
   },
   {
-    id: 'm-14',
-    categoryId: 'cat-cocktails',
-    name: 'Passion & Basil Paloma',
-    description: 'Tequila blanco, çarkıfelek meyvesi püresi, taze pembe greyfurt suyu, fesleğen ve tütsülü deniz tuzu',
-    price: 490,
-    station: 'bar',
-    prepTimeMinutes: 4,
-    calories: 170,
-    isAvailable: true,
-  },
-  {
-    id: 'm-15',
-    categoryId: 'cat-cocktails',
-    name: 'Ev Yapımı Lavantalı Limonata',
-    description: 'Organik limonlar, taze lavanta şurubu, nane ve maden suyu ile alkolsüz serinletici lezzet',
-    price: 210,
-    station: 'bar',
-    prepTimeMinutes: 3,
-    calories: 110,
-    isAvailable: true,
-  },
-  {
-    id: 'm-16',
-    categoryId: 'cat-cocktails',
-    name: 'San Pellegrino Doğal Maden Suyu (750ml)',
-    description: 'İtalyan Alpleri kaynaklı doğal mineralli maden suyu',
-    price: 180,
-    station: 'bar',
-    prepTimeMinutes: 1,
-    isAvailable: true,
-  },
-
-  // Şarap Seçkisi
-  {
     id: 'm-17',
     categoryId: 'cat-wine',
     name: 'Urla Tempus (Şişe 750ml)',
@@ -292,18 +218,6 @@ export const MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
   },
   {
-    id: 'm-18',
-    categoryId: 'cat-wine',
-    name: 'Chablis Premier Cru (Kadeh)',
-    description: 'Mineral dengesi yüksek, narenciye ve beyaz çiçek aromalı Fransız beyaz şarabı',
-    price: 650,
-    station: 'bar',
-    prepTimeMinutes: 2,
-    isAvailable: true,
-  },
-
-  // Tatlılar
-  {
     id: 'm-19',
     categoryId: 'cat-desserts',
     name: 'Geleneksel Mascarpone Tiramisu',
@@ -313,30 +227,6 @@ export const MENU_ITEMS: MenuItem[] = [
     prepTimeMinutes: 5,
     calories: 450,
     allergens: ['Gluten', 'Süt Ürünü', 'Yumurta'],
-    isAvailable: true,
-  },
-  {
-    id: 'm-20',
-    categoryId: 'cat-desserts',
-    name: 'Sıcak Belçika Çikolatalı Fondant',
-    description: 'Akışkan sıcak çikolata kalpli kek, madagaskar vanilyalı taze dondurma ve çıtır antep fıstığı ile',
-    price: 390,
-    station: 'pastry',
-    prepTimeMinutes: 10,
-    calories: 580,
-    allergens: ['Gluten', 'Süt Ürünü', 'Yumurta', 'Fıstık'],
-    isAvailable: true,
-  },
-  {
-    id: 'm-21',
-    categoryId: 'cat-desserts',
-    name: 'Double Espresso & Macaron İkilisi',
-    description: 'Taze çekilmiş %100 arabica single-origin espresso yanında şefin özel fıstıklı ve frambuazlı macaronları',
-    price: 240,
-    station: 'bar',
-    prepTimeMinutes: 3,
-    calories: 140,
-    allergens: ['Süt Ürünü', 'Badem'],
     isAvailable: true,
   },
 ];
@@ -353,46 +243,18 @@ export const INITIAL_ORDERS: Order[] = [
     items: [
       { id: 'oi-1', menuItemId: 'm-1', name: 'Dana Carpaccio di Manzo', unitPrice: 490, quantity: 1, selectedModifiers: [], station: 'cold_kitchen', status: 'served', addedAt: new Date(Date.now() - 35 * 60000).toISOString() },
       { id: 'oi-2', menuItemId: 'm-4', name: 'Dry-Aged Dana Antrikot (350gr)', unitPrice: 1235, quantity: 2, selectedModifiers: [{ groupName: 'Pişme Derecesi', name: 'Orta Az (Med-Rare)', priceDelta: 0 }, { groupName: 'Sos Seçimi', name: 'Siyah Trüf Mantarlı Sos', priceDelta: 85 }], station: 'hot_kitchen', status: 'preparing', specialNote: 'Bir tanesi az tuzlu olsun', addedAt: new Date(Date.now() - 25 * 60000).toISOString() },
-      { id: 'oi-3', menuItemId: 'm-16', name: 'San Pellegrino Doğal Maden Suyu (750ml)', unitPrice: 180, quantity: 2, selectedModifiers: [], station: 'bar', status: 'served', addedAt: new Date(Date.now() - 35 * 60000).toISOString() },
     ],
-    subtotal: 3320,
+    subtotal: 2960,
     discountRate: 0,
     discountAmount: 0,
     coverCharge: 160,
     taxRate: 10,
-    total: 3480,
+    total: 3120,
     paidAmount: 0,
-    remainingAmount: 3480,
+    remainingAmount: 3120,
     payments: [],
     status: 'open',
     createdAt: new Date(Date.now() - 42 * 60000).toISOString(),
-  },
-  {
-    id: 'ord-102',
-    tableId: 't-2',
-    tableNumber: 'A-2',
-    section: 'ana_salon',
-    waiterId: 'staff-1',
-    waiterName: 'Caner Yıldız',
-    guestCount: 4,
-    items: [
-      { id: 'oi-4', menuItemId: 'm-2', name: 'Taze Burrata con Pomodorini', unitPrice: 460, quantity: 2, selectedModifiers: [], station: 'cold_kitchen', status: 'served', addedAt: new Date(Date.now() - 55 * 60000).toISOString() },
-      { id: 'oi-5', menuItemId: 'm-7', name: 'Trüflü El Açması Pappardelle', unitPrice: 580, quantity: 2, selectedModifiers: [], station: 'hot_kitchen', status: 'served', addedAt: new Date(Date.now() - 40 * 60000).toISOString() },
-      { id: 'oi-6', menuItemId: 'm-10', name: 'Pizza Tartufata & Bresaola', unitPrice: 640, quantity: 2, selectedModifiers: [], station: 'hot_kitchen', status: 'served', addedAt: new Date(Date.now() - 40 * 60000).toISOString() },
-      { id: 'oi-7', menuItemId: 'm-17', name: 'Urla Tempus (Şişe 750ml)', unitPrice: 2400, quantity: 1, selectedModifiers: [], station: 'bar', status: 'served', addedAt: new Date(Date.now() - 50 * 60000).toISOString() },
-      { id: 'oi-8', menuItemId: 'm-19', name: 'Geleneksel Mascarpone Tiramisu', unitPrice: 360, quantity: 2, selectedModifiers: [], station: 'pastry', status: 'ready', isGift: true, addedAt: new Date(Date.now() - 15 * 60000).toISOString() },
-    ],
-    subtotal: 5760,
-    discountRate: 10,
-    discountAmount: 576,
-    coverCharge: 320,
-    taxRate: 10,
-    total: 5504,
-    paidAmount: 0,
-    remainingAmount: 5504,
-    payments: [],
-    status: 'open',
-    createdAt: new Date(Date.now() - 65 * 60000).toISOString(),
   },
 ];
 
@@ -409,10 +271,8 @@ export const INITIAL_INVENTORY: InventoryItem[] = [
   { id: 'inv-3', name: 'Siyah Trüf Mantarı & Yağı', unit: 'lt', currentStock: 3.4, criticalStock: 1.5, costPerUnit: 1400, lastUpdated: new Date().toISOString() },
   { id: 'inv-4', name: 'İtalyan San Marzano Domatesi', unit: 'kg', currentStock: 45.0, criticalStock: 15, costPerUnit: 75, lastUpdated: new Date().toISOString() },
   { id: 'inv-5', name: 'Taze Norveç Somonu', unit: 'kg', currentStock: 12.0, criticalStock: 4, costPerUnit: 520, lastUpdated: new Date().toISOString() },
-  { id: 'inv-6', name: 'Carnaroli & Arborio Pirinç', unit: 'kg', currentStock: 30.0, criticalStock: 8, costPerUnit: 95, lastUpdated: new Date().toISOString() },
   { id: 'inv-7', name: 'Organik Tipo 00 Pizza Unu', unit: 'kg', currentStock: 85.0, criticalStock: 25, costPerUnit: 45, lastUpdated: new Date().toISOString() },
   { id: 'inv-8', name: 'Mascarpone & Valrhona Kakao', unit: 'kg', currentStock: 8.8, criticalStock: 3, costPerUnit: 290, lastUpdated: new Date().toISOString() },
-  { id: 'inv-9', name: 'Bourbon & Alkollü Stok', unit: 'lt', currentStock: 19.5, criticalStock: 6, costPerUnit: 850, lastUpdated: new Date().toISOString() },
   { id: 'inv-10', name: 'Single Origin Kahve Çekirdeği', unit: 'kg', currentStock: 15.0, criticalStock: 5, costPerUnit: 380, lastUpdated: new Date().toISOString() },
 ];
 
@@ -431,23 +291,6 @@ export const INITIAL_RECIPES: Recipe[] = [
     ingredients: [
       { inventoryItemId: 'inv-2', ingredientName: 'Manda Burrata & Fior di Latte', amount: 0.20, unit: 'kg' },
       { inventoryItemId: 'inv-4', ingredientName: 'İtalyan San Marzano Domatesi', amount: 0.15, unit: 'kg' },
-    ],
-  },
-  {
-    menuItemId: 'm-10',
-    menuItemName: 'Pizza Tartufata & Bresaola',
-    ingredients: [
-      { inventoryItemId: 'inv-7', ingredientName: 'Organik Tipo 00 Pizza Unu', amount: 0.25, unit: 'kg' },
-      { inventoryItemId: 'inv-2', ingredientName: 'Manda Burrata & Fior di Latte', amount: 0.12, unit: 'kg' },
-      { inventoryItemId: 'inv-3', ingredientName: 'Siyah Trüf Mantarı & Yağı', amount: 0.015, unit: 'lt' },
-    ],
-  },
-  {
-    menuItemId: 'm-19',
-    menuItemName: 'Geleneksel Mascarpone Tiramisu',
-    ingredients: [
-      { inventoryItemId: 'inv-8', ingredientName: 'Mascarpone & Valrhona Kakao', amount: 0.16, unit: 'kg' },
-      { inventoryItemId: 'inv-10', ingredientName: 'Single Origin Kahve Çekirdeği', amount: 0.03, unit: 'kg' },
     ],
   },
 ];
@@ -477,3 +320,172 @@ export const INITIAL_Z_REPORT: ZReport = {
     { waiterName: 'Selin Demir', amount: 34450, count: 20 },
   ],
 };
+
+// ----------------- YENİ MODÜLLER MOCK VERİLERİ (EKRAN GÖRÜNTÜLERİ) ----------------- //
+
+export const INITIAL_DELIVERY_ORDERS: DeliveryOrder[] = [
+  {
+    id: 'del-1',
+    orderNumber: 'PK-4091',
+    platform: 'yemeksepeti',
+    customerName: 'Burak Korkmaz',
+    customerPhone: '0532 555 12 34',
+    deliveryAddress: 'Teşvikiye Mah. Hüsrev Gerede Cad. No: 18 D: 4 Şişli / İstanbul',
+    items: [
+      { name: 'Pizza Tartufata & Bresaola', quantity: 2, price: 1280 },
+      { name: 'Geleneksel Mascarpone Tiramisu', quantity: 2, price: 720 },
+    ],
+    total: 2000,
+    paymentType: 'Online Kredi Kartı',
+    courierName: 'Mehmet Kaya',
+    status: 'on_the_way',
+    createdAt: new Date(Date.now() - 18 * 60000).toISOString(),
+    estimatedDeliveryMinutes: 12,
+  },
+  {
+    id: 'del-2',
+    orderNumber: 'PK-4092',
+    platform: 'getir',
+    customerName: 'Aylin Çetin',
+    customerPhone: '0544 321 98 76',
+    deliveryAddress: 'Bebek Mah. Cevdetpaşa Cad. No: 45 Beşiktaş / İstanbul',
+    items: [
+      { name: 'Trüflü El Açması Pappardelle', quantity: 1, price: 580 },
+      { name: 'Taze Burrata con Pomodorini', quantity: 1, price: 460 },
+    ],
+    total: 1040,
+    paymentType: 'Online Kredi Kartı',
+    courierName: 'Burak Yılmaz',
+    status: 'preparing',
+    createdAt: new Date(Date.now() - 8 * 60000).toISOString(),
+    estimatedDeliveryMinutes: 25,
+  },
+  {
+    id: 'del-3',
+    orderNumber: 'PK-4093',
+    platform: 'phone',
+    customerName: 'Murat Özkan',
+    customerPhone: '0555 987 65 43',
+    deliveryAddress: 'Harbiye Mah. Abdi İpekçi Cad. No: 12 Şişli / İstanbul',
+    items: [
+      { name: 'Dry-Aged Dana Antrikot (350gr)', quantity: 2, price: 2300 },
+      { name: 'Urla Tempus (Şişe 750ml)', quantity: 1, price: 2400 },
+    ],
+    total: 4700,
+    paymentType: 'Kapıda Kart',
+    status: 'pending',
+    createdAt: new Date(Date.now() - 3 * 60000).toISOString(),
+    estimatedDeliveryMinutes: 35,
+  },
+];
+
+export const INITIAL_COURIERS: Courier[] = [
+  {
+    id: 'cour-1',
+    name: 'Mehmet Kaya',
+    phone: '0535 111 22 33',
+    vehicle: 'Motosiklet',
+    status: 'delivering',
+    activeDeliveryId: 'del-1',
+    completedTodayCount: 14,
+    currentLocationName: 'Teşvikiye / Maçka Parkı Yanı',
+  },
+  {
+    id: 'cour-2',
+    name: 'Burak Yılmaz',
+    phone: '0536 222 33 44',
+    vehicle: 'Motosiklet',
+    status: 'delivering',
+    activeDeliveryId: 'del-2',
+    completedTodayCount: 11,
+    currentLocationName: 'Beşiktaş Meydan',
+  },
+  {
+    id: 'cour-3',
+    name: 'Serdar Taş',
+    phone: '0537 333 44 55',
+    vehicle: 'Elektrikli Bisiklet',
+    status: 'idle',
+    completedTodayCount: 8,
+    currentLocationName: 'Restoran Kurye Alanı (Beklemede)',
+  },
+];
+
+export const INITIAL_CUSTOMERS: Customer[] = [
+  {
+    id: 'cust-1',
+    name: 'Ahmet Karahan (VIP Cari)',
+    phone: '0532 100 20 30',
+    email: 'ahmet.karahan@holding.com',
+    address: 'Nişantaşı Mim Kemal Öke Cad. No: 8 Şişli',
+    loyaltyPoints: 1450,
+    creditBalance: 12500, // Açık hesap bakiye
+    totalOrdersCount: 38,
+    totalSpent: 84600,
+    lastOrderDate: new Date(Date.now() - 2 * 86400000).toISOString(),
+  },
+  {
+    id: 'cust-2',
+    name: 'Zeynep Alkan',
+    phone: '0542 300 40 50',
+    email: 'zeynep.alkan@gmail.com',
+    address: 'Bebek Parkı Karşısı No: 14',
+    loyaltyPoints: 680,
+    creditBalance: 0,
+    totalOrdersCount: 16,
+    totalSpent: 32400,
+    lastOrderDate: new Date(Date.now() - 4 * 86400000).toISOString(),
+  },
+  {
+    id: 'cust-3',
+    name: 'Emre Demir',
+    phone: '0552 500 60 70',
+    email: 'emre.demir@tech.com',
+    address: 'Caddebostan İskele Sokak No: 22',
+    loyaltyPoints: 340,
+    creditBalance: 2400,
+    totalOrdersCount: 9,
+    totalSpent: 18200,
+    lastOrderDate: new Date(Date.now() - 7 * 86400000).toISOString(),
+  },
+];
+
+export const INITIAL_BRANCHES: Branch[] = [
+  {
+    id: 'br-1',
+    name: 'ZAdisyon Nişantaşı (Merkez)',
+    city: 'İstanbul',
+    district: 'Nişantaşı',
+    isMain: true,
+    phone: '0212 240 00 01',
+    activeTablesCount: 22,
+    dailyRevenue: 72650,
+  },
+  {
+    id: 'br-2',
+    name: 'ZAdisyon Bebek Lounge',
+    city: 'İstanbul',
+    district: 'Bebek',
+    isMain: false,
+    phone: '0212 265 00 02',
+    activeTablesCount: 18,
+    dailyRevenue: 54300,
+  },
+  {
+    id: 'br-3',
+    name: 'ZAdisyon Kadıköy Moda',
+    city: 'İstanbul',
+    district: 'Moda',
+    isMain: false,
+    phone: '0216 330 00 03',
+    activeTablesCount: 15,
+    dailyRevenue: 38900,
+  },
+];
+
+export const INITIAL_HARDWARE: HardwareDevice[] = [
+  { id: 'hw-1', name: 'Ana Mutfak Termal Fiş Yazıcısı (80mm)', type: 'printer_kitchen', ipAddress: '192.168.1.120', status: 'connected', paperLevelPercent: 88 },
+  { id: 'hw-2', name: 'Mixology Bar Yazıcısı (80mm)', type: 'printer_kitchen', ipAddress: '192.168.1.121', status: 'connected', paperLevelPercent: 72 },
+  { id: 'hw-3', name: 'Kasa ÖKC POS & Fatura Terminali', type: 'payment_terminal', ipAddress: '192.168.1.150', status: 'connected', paperLevelPercent: 95 },
+  { id: 'hw-4', name: 'Caller ID Arayan Numara Gösterici (Paket Servis)', type: 'caller_id', ipAddress: 'USB-COM3', status: 'connected', paperLevelPercent: 100 },
+];
