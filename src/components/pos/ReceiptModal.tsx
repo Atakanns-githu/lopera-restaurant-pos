@@ -3,10 +3,12 @@
 import React from 'react';
 import { usePOS } from '@/lib/store';
 import { sounds } from '@/lib/audio';
-import { Printer, X, CheckCircle2, QrCode } from 'lucide-react';
+import { generateEscPosReceipt, downloadEscPosFile, printViaWebSerial } from '@/lib/escpos';
+import { downloadEadisyonXml } from '@/lib/eAdisyon';
+import { Printer, X, CheckCircle2, QrCode, Download, FileCode, Zap } from 'lucide-react';
 
 export default function ReceiptModal() {
-  const { isReceiptModalOpen, setIsReceiptModalOpen, activeReceiptOrder } = usePOS();
+  const { isReceiptModalOpen, setIsReceiptModalOpen, activeReceiptOrder, currentBranch } = usePOS();
 
   if (!isReceiptModalOpen || !activeReceiptOrder) return null;
 
@@ -15,6 +17,27 @@ export default function ReceiptModal() {
   const handlePrint = () => {
     sounds.playPrintReceipt();
     window.print();
+  };
+
+  const handleEscPosDownload = () => {
+    sounds.playPrintReceipt();
+    const bytes = generateEscPosReceipt(order, {
+      branchName: currentBranch?.name || 'ZADİSYON NİŞANTAŞI',
+    });
+    downloadEscPosFile(bytes, `adisyon_${order.tableNumber}.prn`);
+  };
+
+  const handleWebSerialPrint = async () => {
+    sounds.playTap();
+    const bytes = generateEscPosReceipt(order, {
+      branchName: currentBranch?.name || 'ZADİSYON NİŞANTAŞI',
+    });
+    await printViaWebSerial(bytes);
+  };
+
+  const handleDownloadXml = () => {
+    sounds.playTap();
+    downloadEadisyonXml(order);
   };
 
   return (
@@ -28,21 +51,23 @@ export default function ReceiptModal() {
           {/* Restaurant Header */}
           <div className="text-center pb-3 border-b border-dashed border-stone-400 space-y-1">
             <h2 className="font-serif font-black text-base tracking-widest text-stone-900">
-              L&apos;OPÉRA BISTRO
+              ZADİSYON
             </h2>
-            <p className="text-[10px] text-stone-600">FINE DINING & LOUNGE RESTORAN</p>
-            <p className="text-[9px] text-stone-500">Vali Konağı Cad. No: 42 Nişantaşı / İSTANBUL</p>
-            <p className="text-[9px] text-stone-500">VKN: 8420194821 • MERSİS: 084201948210001</p>
+            <p className="text-[10px] text-stone-700 font-bold uppercase">
+              {currentBranch?.name || 'NİŞANTAŞI (MERKEZ)'}
+            </p>
+            <p className="text-[9px] text-stone-500">Abdi İpekçi Cad. No: 42 Nişantaşı / İSTANBUL</p>
+            <p className="text-[9px] text-stone-500">VKN: 9480128491 • V.D.: BEYOĞLU</p>
           </div>
 
           {/* Ticket Meta */}
           <div className="py-2.5 border-b border-dashed border-stone-400 space-y-1 text-[11px]">
             <div className="flex justify-between">
-              <span>MASA: {order.tableNumber}</span>
+              <span className="font-bold">MASA: {order.tableNumber}</span>
               <span>KİŞİ: {order.guestCount}</span>
             </div>
             <div className="flex justify-between">
-              <span>FİŞ NO: #{order.id.slice(-6).toUpperCase()}</span>
+              <span>ADİSYON NO: #{order.id.slice(-6).toUpperCase()}</span>
               <span>
                 TARİH:{' '}
                 {new Date(order.createdAt).toLocaleDateString('tr-TR', {
@@ -145,7 +170,7 @@ export default function ReceiptModal() {
               {order.payments.map((p) => (
                 <div key={p.id} className="flex justify-between">
                   <span>
-                    {p.method === 'credit_card' && 'Kredi Kartı (Temassız)'}
+                    {p.method === 'credit_card' && 'Kredi Kartı (Temassız ÖKC)'}
                     {p.method === 'cash' && 'Nakit Tahsilat'}
                     {p.method === 'meal_voucher' && 'Yemek Kartı'}
                     {p.method === 'online' && 'FAST / QR'}
@@ -163,7 +188,9 @@ export default function ReceiptModal() {
                 <QrCode className="w-14 h-14" />
               </div>
             </div>
-            <p className="text-[9px] text-stone-500">e-Adisyon Bilgi Fişidir • Mali Değeri Yoktur</p>
+            <p className="text-[9px] text-stone-500 font-semibold">
+              509 VUK GİB e-Adisyon Bilgi Fişidir
+            </p>
             <p className="text-[10px] font-bold tracking-widest text-stone-800">
               BİZİ TERCİH ETTİĞİNİZ İÇİN TEŞEKKÜR EDERİZ
             </p>
@@ -173,24 +200,47 @@ export default function ReceiptModal() {
           <div className="thermal-receipt-zigzag-bottom -mb-6 -mx-6 mt-4" />
         </div>
 
-        {/* Modal Controls */}
-        <div className="flex items-center gap-3 w-full mt-4">
-          <button
-            onClick={() => {
-              sounds.playTap();
-              setIsReceiptModalOpen(false);
-            }}
-            className="flex-1 py-3 rounded-2xl bg-stone-800 hover:bg-stone-700 text-stone-300 font-semibold text-xs transition-colors"
-          >
-            Kapat
-          </button>
-          <button
-            onClick={handlePrint}
-            className="flex-2 py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition-all active:scale-95"
-          >
-            <Printer className="w-4 h-4" />
-            <span>Termal Fişi Yazdır</span>
-          </button>
+        {/* Modal Controls with Real ESC/POS & GİB XML export buttons */}
+        <div className="flex flex-col gap-2 w-full mt-4">
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={handleEscPosDownload}
+              className="py-2.5 px-3 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold border border-stone-700 flex items-center justify-center gap-1.5 transition-colors"
+              title="Termal Yazıcıya ESC/POS Bayt Dosyası (.prn) İndir"
+            >
+              <Download className="w-3.5 h-3.5 text-amber-400" />
+              <span>ESC/POS (.prn)</span>
+            </button>
+
+            <button
+              onClick={handleDownloadXml}
+              className="py-2.5 px-3 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold border border-stone-700 flex items-center justify-center gap-1.5 transition-colors"
+              title="GİB UBL-TR 2.1 E-Adisyon XML İndir"
+            >
+              <FileCode className="w-3.5 h-3.5 text-blue-400" />
+              <span>GİB XML İndir</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                sounds.playTap();
+                setIsReceiptModalOpen(false);
+              }}
+              className="flex-1 py-3 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 font-semibold text-xs transition-colors"
+            >
+              Kapat
+            </button>
+
+            <button
+              onClick={handlePrint}
+              className="flex-2 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-xs shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition-all active:scale-95"
+            >
+              <Printer className="w-4 h-4" />
+              <span>Yazdır (ESC/POS & Termal)</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
