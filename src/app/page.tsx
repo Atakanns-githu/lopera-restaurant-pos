@@ -1,30 +1,113 @@
 'use client';
 
 import React from 'react';
-import { POSProvider, usePOS } from '@/lib/store';
-import Navbar from '@/components/Navbar';
-import FloorPlan2D from '@/components/floor-plan/FloorPlan2D';
-import TableTransferModal from '@/components/floor-plan/TableTransferModal';
-import PosMenu from '@/components/pos/PosMenu';
-import OrderCheckSlip from '@/components/pos/OrderCheckSlip';
-import PaymentModal from '@/components/pos/PaymentModal';
-import ReceiptModal from '@/components/pos/ReceiptModal';
-import KitchenDisplay from '@/components/kds/KitchenDisplay';
-import InventoryManager from '@/components/inventory/InventoryManager';
-import ZReportDashboard from '@/components/reports/ZReportDashboard';
-import StaffPinModal from '@/components/StaffPinModal';
-import DeliveryManager from '@/components/delivery/DeliveryManager';
-import CourierTracker from '@/components/courier/CourierTracker';
-import CustomerManager from '@/components/crm/CustomerManager';
-import BranchManager from '@/components/branches/BranchManager';
-import HardwareManager from '@/components/hardware/HardwareManager';
-
-// Landing Components
+import Link from 'next/link';
 import LandingHeader from '@/components/landing/LandingHeader';
 import LandingHero from '@/components/landing/LandingHero';
 import PillBarSolutions from '@/components/landing/PillBarSolutions';
-import CustomerQrMenuModal from '@/components/landing/CustomerQrMenuModal';
-import { ShieldCheck, Heart, Sparkles, Phone, Mail, MapPin } from 'lucide-react';
+import {
+  ShieldCheck,
+  Heart,
+  Sparkles,
+  Phone,
+  Mail,
+  MapPin,
+  CheckCircle2,
+  Lock,
+  Zap,
+  Server,
+  ArrowRight,
+} from 'lucide-react';
+
+function EnterpriseFeaturesSection() {
+  return (
+    <section id="features" className="py-20 px-4 bg-[#090b10] border-t border-stone-800/60 select-none">
+      <div className="max-w-6xl mx-auto space-y-12">
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>SIFIR GÜVENLİK AÇIĞI • KURUMSAL MİMARİ</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-stone-100 font-serif">
+            GİB ve Maliye Uyumlu Kesintisiz Restoran Altyapısı
+          </h2>
+          <p className="max-w-2xl mx-auto text-xs sm:text-sm text-stone-400">
+            509 Sıra No.lu VUK Genel Tebliği e-Adisyon standartlarına tam uyumlu, TÜBİTAK Kamu SM mali mühür onaylı güvenli bulut mimarisi.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 rounded-3xl bg-[#121624] border border-stone-800 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <Lock className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-base text-stone-100">
+              Uçtan Uca Şifreli & Güvenli
+            </h3>
+            <p className="text-xs text-stone-400 leading-relaxed">
+              Tüm personel işlemleri 4 haneli güvenli PIN ve rol yetkilendirmesi ile korunur. Kasiyer, Garson, Şef ve Müdür yetkileri kesin sınırlarla ayrılmıştır.
+            </p>
+          </div>
+
+          <div className="p-6 rounded-3xl bg-[#121624] border border-stone-800 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
+              <Zap className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-base text-stone-100">
+              Offline & Canlı Senkronizasyon
+            </h3>
+            <p className="text-xs text-stone-400 leading-relaxed">
+              İnternet kesintilerinde yerel terminalde kesintisiz sipariş ve hesap alma devam eder. Bağlantı geldiğinde Supabase ve GİB ile otomatik senkronize olur.
+            </p>
+          </div>
+
+          <div className="p-6 rounded-3xl bg-[#121624] border border-stone-800 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+              <Server className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-base text-stone-100">
+              Çoklu Şube & Bulut Yedekleme
+            </h3>
+            <p className="text-xs text-stone-400 leading-relaxed">
+              Zincir işletmeler için merkezi stok, reçete ve menü kontrolü. 10 yıl yasal mali veri saklama garantisi ile denetimlere daima hazır.
+            </p>
+          </div>
+        </div>
+
+        {/* Quick CTA Banner */}
+        <div className="rounded-3xl bg-gradient-to-r from-amber-500/10 via-[#181d2e] to-amber-500/10 border border-amber-500/30 p-8 text-center space-y-4">
+          <h3 className="text-2xl font-bold font-serif text-stone-100">
+            Hemen Restoran Terminalini Deneyimleyin
+          </h3>
+          <p className="text-xs sm:text-sm text-stone-400 max-w-xl mx-auto">
+            Giriş PIN kodları ile doğrudan terminale geçiş yapabilir veya müşterileriniz için QR menüyü test edebilirsiniz.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <Link
+              href="/terminal/tables"
+              className="py-3 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/20"
+            >
+              <span>Restoran Terminalini Aç</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/menu"
+              className="py-3 px-6 rounded-2xl bg-[#141824] hover:bg-[#1c2235] text-stone-200 font-bold text-xs border border-stone-700"
+            >
+              <span>Müşteri QR Menüyü Aç</span>
+            </Link>
+            <Link
+              href="/login"
+              className="py-3 px-5 rounded-2xl bg-stone-800/80 hover:bg-stone-700 text-stone-300 font-semibold text-xs"
+            >
+              <span>Personel Girişi</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function LandingFooter() {
   return (
@@ -49,11 +132,31 @@ function LandingFooter() {
             Çözümler
           </h4>
           <ul className="space-y-2 text-[11px]">
-            <li className="hover:text-amber-400 cursor-pointer transition-colors">Paket Servis Entegrasyonları</li>
-            <li className="hover:text-amber-400 cursor-pointer transition-colors">Mutfak KDS Ekranları</li>
-            <li className="hover:text-amber-400 cursor-pointer transition-colors">Reçete & Stok Takibi</li>
-            <li className="hover:text-amber-400 cursor-pointer transition-colors">Kurye GPS Telemetri</li>
-            <li className="hover:text-amber-400 cursor-pointer transition-colors">Mali e-Adisyon (GİB)</li>
+            <li>
+              <Link href="/terminal/delivery" className="hover:text-amber-400 transition-colors">
+                Paket Servis Entegrasyonları
+              </Link>
+            </li>
+            <li>
+              <Link href="/terminal/kds" className="hover:text-amber-400 transition-colors">
+                Mutfak KDS Ekranları
+              </Link>
+            </li>
+            <li>
+              <Link href="/terminal/inventory" className="hover:text-amber-400 transition-colors">
+                Reçete & Stok Takibi
+              </Link>
+            </li>
+            <li>
+              <Link href="/terminal/couriers" className="hover:text-amber-400 transition-colors">
+                Kurye GPS Telemetri
+              </Link>
+            </li>
+            <li>
+              <Link href="/terminal/hardware" className="hover:text-amber-400 transition-colors">
+                Mali e-Adisyon (GİB)
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -104,83 +207,25 @@ function LandingFooter() {
   );
 }
 
-function MainApp() {
-  const { mainView, activeTerminalTab } = usePOS();
-
-  if (mainView === 'landing') {
-    return (
-      <div className="min-h-screen w-full bg-[#090b10] text-stone-100 flex flex-col font-sans overflow-x-hidden">
-        {/* Customer & Brand Navigation Header (Mega-Menu Screenshot 1) */}
-        <LandingHeader />
-
-        {/* Hero Section */}
-        <main className="flex-1">
-          <LandingHero />
-
-          {/* Pill Bar Tabs (Screenshot 2) & Solutions Grid (Screenshot 3) */}
-          <PillBarSolutions />
-        </main>
-
-        {/* Brand Footer */}
-        <LandingFooter />
-
-        {/* Customer Interactive QR Digital Menu Simulator Modal */}
-        <CustomerQrMenuModal />
-
-        {/* Staff PIN Modal (For admin terminal secure entry) */}
-        <StaffPinModal />
-      </div>
-    );
-  }
-
-  // Terminal (POS Operating System) View
-  return (
-    <div className="flex flex-col h-screen w-screen bg-[#090b10] text-stone-100 overflow-hidden font-sans">
-      {/* Top Navbar */}
-      <Navbar />
-
-      {/* Main Terminal View Area */}
-      <main className="flex-1 flex overflow-hidden relative">
-        {activeTerminalTab === 'floor' && <FloorPlan2D />}
-
-        {activeTerminalTab === 'pos' && (
-          <div className="flex-1 flex w-full h-full overflow-hidden">
-            <PosMenu />
-            <OrderCheckSlip />
-          </div>
-        )}
-
-        {activeTerminalTab === 'kds' && <KitchenDisplay />}
-
-        {activeTerminalTab === 'delivery' && <DeliveryManager />}
-
-        {activeTerminalTab === 'courier' && <CourierTracker />}
-
-        {activeTerminalTab === 'crm' && <CustomerManager />}
-
-        {activeTerminalTab === 'inventory' && <InventoryManager />}
-
-        {activeTerminalTab === 'branches' && <BranchManager />}
-
-        {activeTerminalTab === 'hardware' && <HardwareManager />}
-
-        {activeTerminalTab === 'reports' && <ZReportDashboard />}
-      </main>
-
-      {/* Global Modals */}
-      <StaffPinModal />
-      <TableTransferModal />
-      <PaymentModal />
-      <ReceiptModal />
-      <CustomerQrMenuModal />
-    </div>
-  );
-}
-
 export default function Home() {
   return (
-    <POSProvider>
-      <MainApp />
-    </POSProvider>
+    <div className="min-h-screen w-full bg-[#090b10] text-stone-100 flex flex-col font-sans overflow-x-hidden">
+      {/* Customer & Brand Navigation Header (Mega-Menu Screenshot 1) */}
+      <LandingHeader />
+
+      {/* Hero Section */}
+      <main className="flex-1">
+        <LandingHero />
+
+        {/* Pill Bar Tabs (Screenshot 2) & Solutions Grid (Screenshot 3) */}
+        <PillBarSolutions />
+
+        {/* Enterprise & Security Highlights */}
+        <EnterpriseFeaturesSection />
+      </main>
+
+      {/* Brand Footer */}
+      <LandingFooter />
+    </div>
   );
 }

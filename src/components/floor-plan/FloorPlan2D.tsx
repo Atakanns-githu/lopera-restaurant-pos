@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { usePOS } from '@/lib/store';
 import { SECTIONS } from '@/lib/mockData';
 import { TableItem } from '@/types/pos';
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react';
 
 export default function FloorPlan2D() {
+  const router = useRouter();
   const {
     tables,
     currentSection,
@@ -183,6 +185,7 @@ export default function FloorPlan2D() {
                   onClick={() => {
                     sounds.playTap();
                     selectTableAndOpenPOS(table.id);
+                    router.push('/terminal/pos');
                   }}
                   className="col-span-2 py-2.5 rounded-xl bg-amber-500 text-stone-950 font-bold text-xs hover:bg-amber-400 transition-colors shadow-sm flex items-center justify-center gap-1.5"
                 >

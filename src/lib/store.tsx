@@ -38,6 +38,7 @@ import {
   MENU_ITEMS,
 } from './mockData';
 import { sounds } from './audio';
+import { syncOrderToSupabase, syncTableStatusToSupabase, syncInventoryToSupabase } from './dbSync';
 
 export type TerminalTab =
   | 'floor'
@@ -400,7 +401,9 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
         const updatedItems = order.items.map((item) =>
           item.status === 'pending' ? { ...item, status: 'preparing' as const } : item
         );
-        return { ...order, items: updatedItems };
+        const updatedOrder = { ...order, items: updatedItems };
+        syncOrderToSupabase(updatedOrder);
+        return updatedOrder;
       })
     );
   };
@@ -424,6 +427,7 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
 
   const requestTableBill = (tableId: string) => {
     sounds.playTap();
+    syncTableStatusToSupabase(tableId, 'bill_requested');
     setTables((prev) =>
       prev.map((t) => (t.id === tableId ? { ...t, status: 'bill_requested' as TableStatus } : t))
     );
@@ -559,6 +563,7 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
 
   const clearTable = (tableId: string) => {
     sounds.playTap();
+    syncTableStatusToSupabase(tableId, 'empty');
     setTables((prev) =>
       prev.map((t) =>
         t.id === tableId
@@ -576,6 +581,7 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateInventoryStock = (itemId: string, newStock: number) => {
+    syncInventoryToSupabase(itemId, newStock);
     setInventory((prev) =>
       prev.map((i) => (i.id === itemId ? { ...i, currentStock: newStock, lastUpdated: new Date().toISOString() } : i))
     );

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { usePOS } from '@/lib/store';
+import Link from 'next/link';
 import { sounds } from '@/lib/audio';
 import {
   Sparkles,
@@ -16,8 +16,6 @@ import {
 } from 'lucide-react';
 
 export default function LandingHero() {
-  const { setMainView, setIsPinModalOpen, setIsQrMenuModalOpen } = usePOS();
-
   return (
     <section className="relative pt-12 pb-20 px-4 overflow-hidden select-none">
       {/* Background radial ambient glow */}
@@ -43,29 +41,25 @@ export default function LandingHero() {
           Masa adisyonu, canlı KDS mutfak ekranı, Yemeksepeti / Getir paket servis entegrasyonu, harita üzerinde anlık kurye takibi, reçeteli stok düşüşü ve resmi gün sonu Z-raporu.
         </p>
 
-        {/* CTA Buttons */}
+        {/* CTA Buttons (Real Next.js Links) */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <button
-            onClick={() => {
-              sounds.playTap();
-              setMainView('terminal');
-            }}
+          <Link
+            href="/terminal/tables"
+            onClick={() => sounds.playTap()}
             className="py-3.5 px-7 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-extrabold text-sm shadow-xl shadow-amber-500/20 flex items-center gap-2 transition-all active:scale-95"
           >
             <span>Restoran Girişi (ZAdisyon Terminali)</span>
             <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
 
-          <button
-            onClick={() => {
-              sounds.playTap();
-              setIsQrMenuModalOpen(true);
-            }}
+          <Link
+            href="/menu"
+            onClick={() => sounds.playTap()}
             className="py-3.5 px-6 rounded-2xl bg-[#141824] hover:bg-[#1a2030] text-stone-200 font-bold text-sm border border-stone-800 hover:border-amber-500/40 flex items-center gap-2 transition-all"
           >
             <Smartphone className="w-4 h-4 text-amber-400" />
             <span>Müşteri QR Menüyü Dene</span>
-          </button>
+          </Link>
         </div>
 
         {/* Live Metrics Strip */}

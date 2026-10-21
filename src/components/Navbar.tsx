@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { usePOS } from '@/lib/store';
 import { sounds } from '@/lib/audio';
 import {
@@ -11,31 +13,25 @@ import {
   FileSpreadsheet,
   Volume2,
   VolumeX,
-  User,
   Clock,
-  Sparkles,
-  RefreshCw,
   Truck,
   Bike,
   Users,
   Building2,
   Cpu,
   ArrowLeft,
-  ChevronDown,
+  QrCode,
+  ShieldCheck,
 } from 'lucide-react';
-import { TerminalTab } from '@/lib/store';
 
 export default function Navbar() {
+  const pathname = usePathname();
   const {
-    activeTerminalTab,
-    setActiveTerminalTab,
-    setMainView,
     currentStaff,
     setIsPinModalOpen,
     orders,
     inventory,
     deliveryOrders,
-    couriers,
     currentBranch,
   } = usePOS();
 
@@ -74,14 +70,14 @@ export default function Navbar() {
     (d) => d.status === 'pending' || d.status === 'preparing' || d.status === 'on_the_way'
   ).length;
 
-  const tabs: { id: TerminalTab; label: string; icon: React.ReactNode; badge?: React.ReactNode }[] = [
+  const navItems = [
     {
-      id: 'floor',
+      href: '/terminal/tables',
       label: 'Kat & Masa Planı',
       icon: <Layers className="w-4 h-4" />,
     },
     {
-      id: 'pos',
+      href: '/terminal/pos',
       label: 'Hızlı POS',
       icon: <CreditCard className="w-4 h-4" />,
       badge: activeOrdersCount > 0 ? (
@@ -91,7 +87,7 @@ export default function Navbar() {
       ) : null,
     },
     {
-      id: 'kds',
+      href: '/terminal/kds',
       label: 'Mutfak KDS',
       icon: <ChefHat className="w-4 h-4" />,
       badge: kdsPendingCount > 0 ? (
@@ -101,7 +97,7 @@ export default function Navbar() {
       ) : null,
     },
     {
-      id: 'delivery',
+      href: '/terminal/delivery',
       label: 'Paket Servis',
       icon: <Truck className="w-4 h-4" />,
       badge: activeDeliveryCount > 0 ? (
@@ -111,17 +107,17 @@ export default function Navbar() {
       ) : null,
     },
     {
-      id: 'courier',
+      href: '/terminal/couriers',
       label: 'Kurye Takip',
       icon: <Bike className="w-4 h-4" />,
     },
     {
-      id: 'crm',
+      href: '/terminal/crm',
       label: 'Cari & Sadakat',
       icon: <Users className="w-4 h-4" />,
     },
     {
-      id: 'inventory',
+      href: '/terminal/inventory',
       label: 'Stok & Reçete',
       icon: <Boxes className="w-4 h-4" />,
       badge: criticalStockCount > 0 ? (
@@ -131,17 +127,17 @@ export default function Navbar() {
       ) : null,
     },
     {
-      id: 'branches',
+      href: '/terminal/branches',
       label: 'Zincir Şubeler',
       icon: <Building2 className="w-4 h-4" />,
     },
     {
-      id: 'hardware',
+      href: '/terminal/hardware',
       label: 'Donanım & E-Dönüşüm',
       icon: <Cpu className="w-4 h-4" />,
     },
     {
-      id: 'reports',
+      href: '/terminal/reports',
       label: 'Z-Raporu & Finans',
       icon: <FileSpreadsheet className="w-4 h-4" />,
     },
@@ -151,17 +147,26 @@ export default function Navbar() {
     <header className="bg-[#0e111a] border-b border-[#1e2433] px-3 py-2 flex items-center justify-between sticky top-0 z-40 select-none shadow-xl">
       {/* Brand & Concept & Back to Website */}
       <div className="flex items-center gap-3">
-        <button
-          onClick={() => {
-            sounds.playTap();
-            setMainView('landing');
-          }}
+        <Link
+          href="/"
+          onClick={() => sounds.playTap()}
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#141824] hover:bg-[#1a2032] border border-stone-800 text-stone-300 hover:text-amber-400 text-xs font-semibold transition-all group"
-          title="Müşteri ve Marka Tanıtım Sayfasına Dön"
+          title="Marka Tanıtım Sitesine Dön"
         >
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
           <span className="hidden sm:inline">Marka Sitesi</span>
-        </button>
+        </Link>
+
+        <Link
+          href="/menu"
+          target="_blank"
+          onClick={() => sounds.playTap()}
+          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold transition-all"
+          title="Müşteri QR Menüyü Yeni Sekmede Aç"
+        >
+          <QrCode className="w-3.5 h-3.5 text-purple-400" />
+          <span>Müşteri Menü</span>
+        </Link>
 
         <div className="flex items-center gap-2.5 pl-2 border-l border-stone-800">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/20 border border-amber-400/30">
@@ -169,42 +174,40 @@ export default function Navbar() {
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <h1 className="font-serif tracking-wider text-xs font-bold text-stone-100">
+              <span className="font-serif tracking-wider text-xs font-bold text-stone-100">
                 ZADİSYON
-              </h1>
+              </span>
               <span className="text-amber-400 text-[10px] font-sans font-semibold px-1.5 py-0.2 rounded bg-amber-500/10 border border-amber-500/20">
                 {currentBranch.name}
               </span>
             </div>
             <p className="text-[10px] text-stone-400 font-mono tracking-tight">
-              Zynox POS OS v3.2
+              Zynox POS OS v3.4
             </p>
           </div>
         </div>
       </div>
 
-      {/* Main Module Tabs Navigation (Scrollable horizontally if needed) */}
-      <nav className="flex items-center gap-1 bg-[#090b10] p-1 rounded-xl border border-stone-800/80 shadow-inner overflow-x-auto max-w-[62vw] custom-scrollbar">
-        {tabs.map((tab) => {
-          const isActive = activeTerminalTab === tab.id;
+      {/* Main Module Tabs (Real Next.js Links) */}
+      <nav className="flex items-center gap-1 bg-[#090b10] p-1 rounded-xl border border-stone-800/80 shadow-inner overflow-x-auto max-w-[58vw] custom-scrollbar">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href || (item.href === '/terminal/tables' && pathname === '/terminal');
 
           return (
-            <button
-              key={tab.id}
-              onClick={() => {
-                sounds.playTap();
-                setActiveTerminalTab(tab.id);
-              }}
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => sounds.playTap()}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                 isActive
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20'
                   : 'text-stone-300 hover:text-white hover:bg-stone-800/50'
               }`}
             >
-              {tab.icon}
-              <span>{tab.label}</span>
-              {tab.badge}
-            </button>
+              {item.icon}
+              <span>{item.label}</span>
+              {item.badge}
+            </Link>
           );
         })}
       </nav>
@@ -214,7 +217,7 @@ export default function Navbar() {
         {/* Clock */}
         <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#141824] border border-stone-800/80 text-stone-300 font-mono text-xs">
           <Clock className="w-3.5 h-3.5 text-amber-400" />
-          <span>{time || '19:45:00'}</span>
+          <span>{time || '20:15:00'}</span>
         </div>
 
         {/* Audio Mute Toggle */}
