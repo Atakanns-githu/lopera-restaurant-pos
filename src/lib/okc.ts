@@ -7,8 +7,10 @@ export interface OkcSaleRequest {
   amount: number;
   currency?: string;
   tableNumber?: string;
+  orderNumber?: string;
   waiterName?: string;
   installments?: number;
+  paymentMethod?: string;
 }
 
 export interface OkcSaleResponse {

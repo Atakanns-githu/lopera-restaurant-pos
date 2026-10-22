@@ -149,47 +149,47 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#090b10] text-stone-100 overflow-hidden select-none">
+    <div className="flex-1 flex flex-col h-full bg-[#0b0f17] text-slate-100 overflow-hidden select-none">
       {/* Top Header Bar */}
-      <div className="px-6 py-4 bg-[#0e111a] border-b border-stone-800/80 flex flex-wrap items-center justify-between gap-4">
+      <div className="px-6 py-4 bg-[#0e1320] border-b border-slate-800 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/10">
+          <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-amber-400 flex items-center justify-center shadow-sm">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-base font-bold text-stone-100">
+              <h1 className="text-base font-semibold text-slate-100">
                 Yönetici & Güvenlik Konsolu
               </h1>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold">
+              <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-slate-300 font-mono">
                 {currentBranch.name}
               </span>
             </div>
-            <p className="text-xs text-stone-400">
-              Ciro ve satış özetleri, personel yetkilendirme ve sistem denetimi
+            <p className="text-xs text-slate-400 mt-0.5">
+              Ciro özetleri, personel yetkilendirme, PIN güvenliği ve 509 VUK denetimi
             </p>
           </div>
         </div>
 
         {/* Quick Role Badge */}
         <div className="flex items-center gap-2">
-          <span className="text-xs px-3 py-1.5 rounded-xl bg-[#141824] border border-stone-800 text-stone-300 font-medium">
-            Yetkili: <strong className="text-amber-400">{currentStaff.name}</strong> ({currentStaff.role.toUpperCase()})
+          <span className="text-xs px-3 py-1.5 rounded-xl bg-[#111827] border border-slate-800 text-slate-300 font-medium">
+            Yetkili: <strong className="text-amber-400 font-semibold">{currentStaff.name}</strong> ({currentStaff.role.toUpperCase()})
           </span>
         </div>
       </div>
 
       {/* Sub Navbar Tabs */}
-      <div className="px-6 border-b border-stone-800/80 bg-[#0c0f17] flex items-center gap-2 overflow-x-auto">
+      <div className="px-6 border-b border-slate-800 bg-[#0e1320] flex items-center gap-2 overflow-x-auto">
         <button
           onClick={() => {
             sounds.playTap();
             setActiveTab('overview');
           }}
-          className={`py-3 px-4 text-xs font-bold flex items-center gap-2 border-b-2 transition-all ${
+          className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-all ${
             activeTab === 'overview'
               ? 'border-amber-400 text-amber-400'
-              : 'border-transparent text-stone-400 hover:text-stone-200'
+              : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
         >
           <TrendingUp className="w-4 h-4" />
@@ -201,10 +201,10 @@ export default function AdminPage() {
             sounds.playTap();
             setActiveTab('staff');
           }}
-          className={`py-3 px-4 text-xs font-bold flex items-center gap-2 border-b-2 transition-all ${
+          className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-all ${
             activeTab === 'staff'
               ? 'border-amber-400 text-amber-400'
-              : 'border-transparent text-stone-400 hover:text-stone-200'
+              : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
         >
           <Users className="w-4 h-4" />
@@ -216,10 +216,10 @@ export default function AdminPage() {
             sounds.playTap();
             setActiveTab('security');
           }}
-          className={`py-3 px-4 text-xs font-bold flex items-center gap-2 border-b-2 transition-all ${
+          className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-all ${
             activeTab === 'security'
               ? 'border-amber-400 text-amber-400'
-              : 'border-transparent text-stone-400 hover:text-stone-200'
+              : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
         >
           <FileText className="w-4 h-4" />
@@ -231,10 +231,10 @@ export default function AdminPage() {
             sounds.playTap();
             setActiveTab('settings');
           }}
-          className={`py-3 px-4 text-xs font-bold flex items-center gap-2 border-b-2 transition-all ${
+          className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-all ${
             activeTab === 'settings'
               ? 'border-amber-400 text-amber-400'
-              : 'border-transparent text-stone-400 hover:text-stone-200'
+              : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
         >
           <Settings className="w-4 h-4" />
@@ -243,57 +243,57 @@ export default function AdminPage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-6">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {/* ======================= TAB 1: OVERVIEW ======================= */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
             {/* Top Metrics Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-5 rounded-3xl bg-[#121624] border border-stone-800 space-y-2">
-                <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+              <div className="p-5 rounded-2xl bg-[#111827] border border-slate-800 shadow-sm space-y-2">
+                <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
                   Bugünkü Toplam Ciro
                 </span>
-                <div className="text-2xl font-black text-amber-400 font-serif">
-                  {currentZ.grandTotal.toLocaleString('tr-TR')} ₺
+                <div className="text-2xl font-bold font-mono tabular-nums text-amber-400">
+                  ₺{currentZ.grandTotal.toLocaleString('tr-TR')}
                 </div>
                 <div className="text-[11px] text-emerald-400 flex items-center gap-1">
                   <span>+18.4% dünün aynı saatine göre</span>
                 </div>
               </div>
 
-              <div className="p-5 rounded-3xl bg-[#121624] border border-stone-800 space-y-2">
-                <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+              <div className="p-5 rounded-2xl bg-[#111827] border border-slate-800 shadow-sm space-y-2">
+                <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
                   Anlık Açık Masalar
                 </span>
-                <div className="text-2xl font-black text-stone-100 font-serif">
+                <div className="text-2xl font-bold font-mono tabular-nums text-slate-100">
                   {occupiedTablesCount} / {tables.length}
                 </div>
-                <div className="text-[11px] text-stone-400">
-                  Açık Adisyon Tutarı: {activeOrdersTotal.toLocaleString('tr-TR')} ₺
+                <div className="text-[11px] text-slate-400 tabular-nums">
+                  Açık Adisyon Tutarı: ₺{activeOrdersTotal.toLocaleString('tr-TR')}
                 </div>
               </div>
 
-              <div className="p-5 rounded-3xl bg-[#121624] border border-stone-800 space-y-2">
-                <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+              <div className="p-5 rounded-2xl bg-[#111827] border border-slate-800 shadow-sm space-y-2">
+                <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
                   Aktif Görevli Personel
                 </span>
-                <div className="text-2xl font-black text-stone-100 font-serif">
+                <div className="text-2xl font-bold font-mono tabular-nums text-slate-100">
                   {staffList.filter((s) => s.isActive).length} Kişi
                 </div>
-                <div className="text-[11px] text-stone-400">
+                <div className="text-[11px] text-slate-400">
                   Yönetici: {staffList.filter((s) => s.role === 'admin' || s.role === 'manager').length} | Servis: {staffList.filter((s) => s.role === 'waiter').length}
                 </div>
               </div>
 
-              <div className="p-5 rounded-3xl bg-[#121624] border border-stone-800 space-y-2">
-                <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+              <div className="p-5 rounded-2xl bg-[#111827] border border-slate-800 shadow-sm space-y-2">
+                <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
                   509 VUK e-Adisyon Durumu
                 </span>
-                <div className="text-xl font-bold text-emerald-400 flex items-center gap-2">
+                <div className="text-lg font-bold text-emerald-400 flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                   <span>GİB Canlı Aktif</span>
                 </div>
-                <div className="text-[11px] text-stone-400 font-mono">
+                <div className="text-[11px] text-slate-400 font-mono">
                   Mali Mühür: TÜBİTAK Kamu SM OK
                 </div>
               </div>
@@ -727,17 +727,17 @@ export default function AdminPage() {
             </div>
 
             {/* Emergency Lockdown Zone */}
-            <div className="p-6 rounded-3xl bg-[#1f1519] border border-rose-500/30 space-y-3">
+            <div className="p-5 rounded-2xl bg-rose-950/20 border border-rose-900/40 space-y-3">
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400">
+                  <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
                     <ShieldAlert className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-stone-200">
+                    <h4 className="font-semibold text-sm text-slate-200">
                       Acil Durum Terminal Kilidi (Lockdown)
                     </h4>
-                    <p className="text-xs text-stone-400">
+                    <p className="text-xs text-slate-400">
                       Tüm terminal ekranlarını anında dondurur ve sadece yetkili şifresiyle açılır.
                     </p>
                   </div>
@@ -749,10 +749,10 @@ export default function AdminPage() {
                     sounds.playTap();
                     toggleEmergencyLockdown();
                   }}
-                  className={`px-4 py-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 transition-all ${
+                  className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors ${
                     securitySettings.emergencyLockdown
-                      ? 'bg-rose-600 text-white border-rose-500 shadow-lg shadow-rose-600/40 animate-pulse'
-                      : 'bg-rose-500/10 hover:bg-rose-500/25 text-rose-300 border-rose-500/40'
+                      ? 'bg-rose-600 text-white border-rose-500 shadow-sm'
+                      : 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border-rose-500/30'
                   }`}
                 >
                   <ShieldAlert className="w-4 h-4" />

@@ -5,9 +5,6 @@ import { useRouter } from 'next/navigation';
 import { usePOS } from '@/lib/store';
 import { sounds } from '@/lib/audio';
 import {
-  Lock,
-  Delete,
-  ArrowRight,
   ShieldCheck,
   AlertCircle,
   Timer,
@@ -15,6 +12,8 @@ import {
   Building2,
   Mail,
   Key,
+  ArrowRight,
+  Delete,
 } from 'lucide-react';
 
 export default function LoginPage() {
@@ -29,21 +28,21 @@ export default function LoginPage() {
   const [successStaffName, setSuccessStaffName] = useState<string | null>(null);
 
   // Corporate Password Login State
-  const [corporateEmail, setCorporateEmail] = useState<string>('atakan@zynox.com.tr');
+  const [corporateEmail, setCorporateEmail] = useState<string>('atakan@lopera.com.tr');
   const [corporatePassword, setCorporatePassword] = useState<string>('');
 
-  // Anti-Brute Force Koruma Durumu
+  // Anti-Brute Force Protection
   const [failedAttempts, setFailedAttempts] = useState<number>(0);
   const [lockoutSeconds, setLockoutSeconds] = useState<number>(0);
 
-  // Eğer zaten oturum açıksa doğrudan terminale yönlendir
+  // Direct redirection if authenticated
   useEffect(() => {
     if (isAuthenticated) {
       router.replace('/terminal/tables');
     }
   }, [isAuthenticated, router]);
 
-  // Kilit geri sayım sayacı
+  // Lockout countdown timer
   useEffect(() => {
     if (lockoutSeconds <= 0) return;
     const interval = setInterval(() => {
@@ -115,7 +114,6 @@ export default function LoginPage() {
     e.preventDefault();
     sounds.playTap();
 
-    // Check admin or manager by email and password
     const adminStaff = staffList.find(
       (s) => (s.email === corporateEmail || s.role === 'admin' || s.role === 'manager') && s.isActive
     );
@@ -131,40 +129,43 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#090b10] text-stone-100 flex flex-col justify-between p-4 sm:p-8 select-none font-sans">
+    <div className="min-h-screen w-full bg-[#0b0f17] text-slate-100 flex flex-col justify-between p-4 sm:p-8 select-none font-sans">
       {/* Top Header */}
       <div className="max-w-md mx-auto w-full flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center font-serif font-black text-stone-950 text-xs shadow-md">
-            Z
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-serif font-bold text-sm">
+            L
           </div>
-          <span className="font-serif font-bold text-xs tracking-wider text-stone-200">
-            ZADİSYON POS OS
-          </span>
+          <div>
+            <span className="font-semibold text-xs tracking-wider text-slate-200">
+              LOPERA POS
+            </span>
+            <span className="block text-[10px] text-slate-500 font-mono">v2.4 Enterprise</span>
+          </div>
         </div>
 
         <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
           <ShieldCheck className="w-3.5 h-3.5" />
-          <span>TLS 1.3 • Web Crypto SHA-256</span>
+          <span>TLS 1.3 • WebCrypto SHA-256</span>
         </span>
       </div>
 
       {/* Main Login Card */}
-      <div className="max-w-md mx-auto w-full bg-[#121624] border border-stone-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden">
-        {/* Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent shadow-[0_0_20px_#d4af37]" />
-
+      <div className="max-w-md mx-auto w-full bg-[#0e1320] border border-slate-800 rounded-2xl p-6 sm:p-7 shadow-2xl space-y-6 relative overflow-hidden">
         {/* Brand & Branch Selector */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/20 border border-amber-400/40">
-            <span className="font-serif font-black text-2xl text-stone-950">Z</span>
+          <div className="w-12 h-12 mx-auto rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-serif font-bold text-xl shadow-sm">
+            L
           </div>
-          <h2 className="font-serif font-extrabold text-xl text-stone-100 tracking-wide">
-            ZAdisyon Restoran Terminali
-          </h2>
+          <div>
+            <h2 className="font-semibold text-base text-slate-100">
+              Lopera Restoran Terminali
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">Personel yetkilendirme ve vardiya başlangıcı</p>
+          </div>
 
           {/* Branch Picker */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#181d2e] border border-stone-800 text-[11px] text-amber-400 font-semibold">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#111827] border border-slate-800 text-[11px] text-amber-400 font-medium">
             <Building2 className="w-3.5 h-3.5" />
             <select
               value={currentBranch.id}
@@ -172,10 +173,10 @@ export default function LoginPage() {
                 const b = branches.find((item) => item.id === e.target.value);
                 if (b) setCurrentBranch(b);
               }}
-              className="bg-transparent border-none text-amber-400 font-semibold focus:outline-none cursor-pointer"
+              className="bg-transparent border-none text-amber-400 font-medium focus:outline-none cursor-pointer"
             >
               {branches.map((b) => (
-                <option key={b.id} value={b.id} className="bg-[#121624] text-stone-200">
+                <option key={b.id} value={b.id} className="bg-[#0e1320] text-slate-200">
                   {b.name}
                 </option>
               ))}
@@ -184,17 +185,17 @@ export default function LoginPage() {
         </div>
 
         {/* Mode Selector Tabs */}
-        <div className="grid grid-cols-2 gap-1.5 p-1 rounded-2xl bg-[#090b10] border border-stone-800/80">
+        <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-[#0b0f17] border border-slate-800/80">
           <button
             onClick={() => {
               sounds.playTap();
               setLoginMode('pin');
               setErrorMsg(null);
             }}
-            className={`py-2 text-xs font-bold rounded-xl transition-all ${
+            className={`py-2 text-xs font-medium rounded-lg transition-colors ${
               loginMode === 'pin'
-                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-md'
-                : 'text-stone-400 hover:text-white'
+                ? 'bg-amber-500 text-slate-950 font-semibold shadow-sm'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             Personel PIN Girişi
@@ -205,10 +206,10 @@ export default function LoginPage() {
               setLoginMode('password');
               setErrorMsg(null);
             }}
-            className={`py-2 text-xs font-bold rounded-xl transition-all ${
+            className={`py-2 text-xs font-medium rounded-lg transition-colors ${
               loginMode === 'password'
-                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-md'
-                : 'text-stone-400 hover:text-white'
+                ? 'bg-amber-500 text-slate-950 font-semibold shadow-sm'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             Yönetici Girişi (Email)
@@ -220,44 +221,44 @@ export default function LoginPage() {
           <div className="space-y-5">
             {/* Lockout Warning Banner */}
             {lockoutSeconds > 0 ? (
-              <div className="p-4 rounded-2xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-center space-y-1 animate-pulse">
-                <div className="flex items-center justify-center gap-1.5 font-bold text-xs">
+              <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-center space-y-1">
+                <div className="flex items-center justify-center gap-1.5 font-medium text-xs">
                   <Timer className="w-4 h-4 text-rose-400" />
                   <span>GÜVENLİK KİLİDİ AKTİF ({lockoutSeconds} sn)</span>
                 </div>
                 <p className="text-[11px] text-rose-400/90">
-                  Ardışık hatalı denemeler nedeniyle klavye donduruldu.
+                  Ardışık hatalı denemeler nedeniyle klavye geçici olarak donduruldu.
                 </p>
               </div>
             ) : successStaffName ? (
-              <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-center space-y-1 animate-in fade-in">
-                <div className="flex items-center justify-center gap-1.5 font-bold text-sm">
+              <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-center space-y-1 animate-in fade-in duration-150">
+                <div className="flex items-center justify-center gap-1.5 font-medium text-sm">
                   <UserCheck className="w-4 h-4 text-emerald-400" />
                   <span>Giriş Başarılı</span>
                 </div>
-                <p className="text-xs text-stone-200">
+                <p className="text-xs text-slate-200">
                   Hoş geldiniz, <strong>{successStaffName}</strong>. Terminal açılıyor...
                 </p>
               </div>
             ) : (
               /* PIN Mask Indicators */
               <div className="flex flex-col items-center space-y-2 py-1">
-                <p className="text-xs text-stone-400">4 haneli yetkili personel PIN kodunuzu giriniz</p>
+                <p className="text-xs text-slate-400">4 haneli yetkili personel PIN kodunuzu giriniz</p>
                 <div className="flex gap-4 pt-1">
                   {[0, 1, 2, 3].map((idx) => (
                     <div
                       key={idx}
-                      className={`w-4 h-4 rounded-full border-2 transition-all duration-150 ${
+                      className={`w-3.5 h-3.5 rounded-full border transition-all duration-150 ${
                         pin.length > idx
-                          ? 'bg-amber-400 border-amber-400 shadow-md shadow-amber-400/40 scale-110'
-                          : 'border-stone-700 bg-stone-900/60'
+                          ? 'bg-amber-400 border-amber-400 shadow-sm shadow-amber-400/30 scale-110'
+                          : 'border-slate-700 bg-slate-800'
                       }`}
                     />
                   ))}
                 </div>
 
                 {errorMsg && (
-                  <div className="text-xs text-rose-400 font-semibold flex items-center gap-1.5 pt-1 animate-shake">
+                  <div className="text-xs text-rose-400 font-medium flex items-center gap-1.5 pt-1">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>{errorMsg}</span>
                   </div>
@@ -266,13 +267,13 @@ export default function LoginPage() {
             )}
 
             {/* Numeric Keypad */}
-            <div className="grid grid-cols-3 gap-2.5 max-w-xs mx-auto">
+            <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto">
               {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
                 <button
                   key={digit}
                   disabled={lockoutSeconds > 0}
                   onClick={() => handleDigit(digit)}
-                  className="h-12 rounded-2xl bg-[#181d2e] hover:bg-[#222942] active:scale-95 disabled:opacity-40 disabled:pointer-events-none border border-stone-800 text-stone-100 font-mono font-bold text-lg flex items-center justify-center transition-all shadow-sm"
+                  className="h-11 rounded-xl bg-[#111827] hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none border border-slate-800 text-slate-100 font-mono font-semibold text-base flex items-center justify-center transition-colors"
                 >
                   {digit}
                 </button>
@@ -280,23 +281,23 @@ export default function LoginPage() {
               <button
                 disabled={lockoutSeconds > 0}
                 onClick={handleClear}
-                className="h-12 rounded-2xl bg-[#181d2e] hover:bg-[#222942] active:scale-95 disabled:opacity-40 border border-stone-800 text-stone-400 font-bold text-xs flex items-center justify-center transition-all"
+                className="h-11 rounded-xl bg-slate-800/60 hover:bg-slate-800 disabled:opacity-40 border border-slate-800 text-slate-400 font-medium text-xs flex items-center justify-center transition-colors"
               >
                 TEMİZLE
               </button>
               <button
                 disabled={lockoutSeconds > 0}
                 onClick={() => handleDigit('0')}
-                className="h-12 rounded-2xl bg-[#181d2e] hover:bg-[#222942] active:scale-95 disabled:opacity-40 border border-stone-800 text-stone-100 font-mono font-bold text-lg flex items-center justify-center transition-all shadow-sm"
+                className="h-11 rounded-xl bg-[#111827] hover:bg-slate-800 disabled:opacity-40 border border-slate-800 text-slate-100 font-mono font-semibold text-base flex items-center justify-center transition-colors"
               >
                 0
               </button>
               <button
                 disabled={lockoutSeconds > 0}
                 onClick={handleBackspace}
-                className="h-12 rounded-2xl bg-[#181d2e] hover:bg-[#222942] active:scale-95 disabled:opacity-40 border border-stone-800 text-stone-400 flex items-center justify-center transition-all"
+                className="h-11 rounded-xl bg-slate-800/60 hover:bg-slate-800 disabled:opacity-40 border border-slate-800 text-slate-400 flex items-center justify-center transition-colors"
               >
-                <Delete className="w-5 h-5" />
+                <Delete className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -306,7 +307,7 @@ export default function LoginPage() {
         {loginMode === 'password' && (
           <form onSubmit={handleCorporatePasswordLogin} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-stone-400 flex items-center gap-1.5">
+              <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-amber-400" />
                 <span>Kurumsal E-Posta</span>
               </label>
@@ -315,13 +316,13 @@ export default function LoginPage() {
                 required
                 value={corporateEmail}
                 onChange={(e) => setCorporateEmail(e.target.value)}
-                placeholder="yonetici@restoran.com"
-                className="w-full py-2.5 px-3.5 rounded-xl bg-[#181d2e] border border-stone-800 text-xs text-stone-100 placeholder-stone-500 focus:outline-none focus:border-amber-500/60"
+                placeholder="yonetici@lopera.com.tr"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-[#111827] border border-slate-800 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500/60"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-stone-400 flex items-center gap-1.5">
+              <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
                 <Key className="w-3.5 h-3.5 text-amber-400" />
                 <span>Yönetici Parolası</span>
               </label>
@@ -331,12 +332,12 @@ export default function LoginPage() {
                 value={corporatePassword}
                 onChange={(e) => setCorporatePassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full py-2.5 px-3.5 rounded-xl bg-[#181d2e] border border-stone-800 text-xs text-stone-100 placeholder-stone-500 focus:outline-none focus:border-amber-500/60"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-[#111827] border border-slate-800 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500/60"
               />
             </div>
 
             {errorMsg && (
-              <div className="text-xs text-rose-400 font-semibold flex items-center gap-1.5">
+              <div className="text-xs text-rose-400 font-medium flex items-center gap-1.5">
                 <AlertCircle className="w-3.5 h-3.5" />
                 <span>{errorMsg}</span>
               </div>
@@ -344,7 +345,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-98 transition-all"
+              className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs flex items-center justify-center gap-2 shadow-sm transition-colors"
             >
               <span>Yönetim Konsoluna Giriş Yap</span>
               <ArrowRight className="w-4 h-4" />
@@ -354,9 +355,9 @@ export default function LoginPage() {
       </div>
 
       {/* Footer */}
-      <div className="text-center text-[11px] text-stone-500 space-y-0.5">
-        <div>© 2026 ZAdisyon / Zynox Restoran & POS Teknolojileri A.Ş.</div>
-        <div className="text-[10px] text-stone-600">509 Sıra No.lu VUK e-Adisyon Güvenli Donanım Standardı</div>
+      <div className="text-center text-[11px] text-slate-500 space-y-0.5">
+        <div>© 2026 Lopera Restaurant & Gastro POS Systems</div>
+        <div className="text-[10px] text-slate-600">509 Sıra No.lu VUK e-Adisyon Güvenli Donanım Standardı</div>
       </div>
     </div>
   );

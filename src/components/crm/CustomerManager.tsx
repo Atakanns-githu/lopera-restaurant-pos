@@ -18,11 +18,13 @@ import {
   TrendingUp,
   X,
   CreditCard,
+  FileText,
+  BadgeCheck,
 } from 'lucide-react';
 import { Customer } from '@/types/pos';
 
 export default function CustomerManager() {
-  const { customers, addLoyaltyPoints, recordCreditPayment } = usePOS();
+  const { customers, addLoyaltyPoints, recordCreditPayment, addCustomer } = usePOS();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'credit' | 'vip'>('all');
 
@@ -39,6 +41,7 @@ export default function CustomerManager() {
   const [newCustPhone, setNewCustPhone] = useState('');
   const [newCustEmail, setNewCustEmail] = useState('');
   const [newCustAddress, setNewCustAddress] = useState('');
+  const [newCustError, setNewCustError] = useState<string | null>(null);
 
   const filteredCustomers = customers.filter((c) => {
     const matchesSearch =
@@ -89,21 +92,62 @@ export default function CustomerManager() {
     setSelectedCustomer(null);
   };
 
+  const handleCreateCustomer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCustName.trim()) {
+      setNewCustError('Lütfen müşteri adı ve soyadı giriniz');
+      return;
+    }
+    if (!newCustPhone.trim()) {
+      setNewCustError('Lütfen telefon numarası giriniz');
+      return;
+    }
+
+    const newCustomer: Customer = {
+      id: `cust-${Date.now()}`,
+      name: newCustName.trim(),
+      phone: newCustPhone.trim(),
+      email: newCustEmail.trim() || `${newCustName.toLowerCase().replace(/\s+/g, '')}@musteri.com`,
+      address: newCustAddress.trim() || 'İstanbul',
+      loyaltyPoints: 0,
+      creditBalance: 0,
+      totalOrdersCount: 0,
+      totalSpent: 0,
+      lastOrderDate: new Date().toISOString(),
+    };
+
+    if (addCustomer) {
+      addCustomer(newCustomer);
+    }
+    sounds.playTap();
+    setIsNewCustomerModalOpen(false);
+    setNewCustName('');
+    setNewCustPhone('');
+    setNewCustEmail('');
+    setNewCustAddress('');
+    setNewCustError(null);
+  };
+
   return (
-    <div className="flex-1 flex flex-col h-full w-full bg-[#090b10] text-stone-100 overflow-hidden select-none">
-      {/* Top Header & KPI Cards */}
-      <div className="p-4 border-b border-stone-800/80 bg-[#0e111a]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+    <div className="flex-1 flex flex-col h-full w-full bg-[#0b0f17] text-slate-100 overflow-hidden select-none">
+      {/* Top Header & Metrics Banner */}
+      <div className="p-5 border-b border-slate-800/80 bg-[#0e1320]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700/80 text-amber-400 flex items-center justify-center shadow-sm">
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-bold text-base text-stone-100">
-                Cari Müşteri & Sadakat (CRM)
-              </h2>
-              <p className="text-xs text-stone-400">
-                Veresiye / açık hesap takibi, puan yönetimi ve müşteri geçmişi
+              <div className="flex items-center gap-2">
+                <h1 className="font-semibold text-base text-slate-100 tracking-tight">
+                  Cari & Sadakat Portföyü
+                </h1>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                  CRM v2.4
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Açık hesap bakiyeleri, veresiye mutabakatı ve kurumsal misafir yönetimi
               </p>
             </div>
           </div>
@@ -113,197 +157,200 @@ export default function CustomerManager() {
               sounds.playTap();
               setIsNewCustomerModalOpen(true);
             }}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-amber-500/20"
+            className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-[0.98]"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>Yeni Cari Müşteri Ekle</span>
           </button>
         </div>
 
-        {/* 3 Metrics Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="p-3.5 rounded-2xl bg-[#121624] border border-stone-800 flex items-center justify-between">
+        {/* 3 High-Craft Financial Metrics Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+          <div className="p-4 rounded-xl bg-[#121826] border border-slate-800 flex items-center justify-between">
             <div>
-              <div className="text-xs text-stone-400">Toplam Açık Hesap (Cari Borç)</div>
-              <div className="text-lg font-bold font-mono text-rose-400 mt-0.5">
-                {totalCreditDebt.toLocaleString('tr-TR')} ₺
+              <div className="text-xs font-medium text-slate-400">Toplam Açık Hesap (Cari Borç)</div>
+              <div className="text-xl font-bold font-mono tabular-nums text-rose-400 mt-1">
+                ₺{totalCreditDebt.toLocaleString('tr-TR')}
               </div>
             </div>
-            <div className="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center">
               <Wallet className="w-4 h-4" />
             </div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-[#121624] border border-stone-800 flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-[#121826] border border-slate-800 flex items-center justify-between">
             <div>
-              <div className="text-xs text-stone-400">Toplam Sadakat Puanı</div>
-              <div className="text-lg font-bold font-mono text-amber-400 mt-0.5">
-                {totalLoyaltyPoints.toLocaleString('tr-TR')} Puan
+              <div className="text-xs font-medium text-slate-400">Toplam Sadakat Puanı</div>
+              <div className="text-xl font-bold font-mono tabular-nums text-amber-400 mt-1">
+                {totalLoyaltyPoints.toLocaleString('tr-TR')} <span className="text-xs font-normal text-slate-400">Puan</span>
               </div>
             </div>
-            <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
               <Award className="w-4 h-4" />
             </div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-[#121624] border border-stone-800 flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-[#121826] border border-slate-800 flex items-center justify-between">
             <div>
-              <div className="text-xs text-stone-400">Kayıtlı Cari Müşteri</div>
-              <div className="text-lg font-bold font-mono text-stone-100 mt-0.5">
-                {customers.length} Müşteri
+              <div className="text-xs font-medium text-slate-400">Kayıtlı Cari Müşteri</div>
+              <div className="text-xl font-bold font-mono tabular-nums text-slate-100 mt-1">
+                {customers.length} <span className="text-xs font-normal text-slate-400">Misafir</span>
               </div>
             </div>
-            <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
         </div>
 
-        {/* Filters & Search Row */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
-          <div className="flex items-center gap-1.5 w-full sm:w-auto">
+        {/* Clean Segmented Control & Search Row */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 pt-3 border-t border-slate-800/60">
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-[#111827] border border-slate-800 w-full sm:w-auto">
             <button
               onClick={() => {
                 sounds.playTap();
                 setFilterType('all');
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 filterType === 'all'
-                  ? 'bg-amber-500 text-stone-950 font-bold'
-                  : 'bg-[#141824] text-stone-300 hover:bg-stone-800'
+                  ? 'bg-slate-800 text-white font-semibold shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              Tüm Müşteriler ({customers.length})
+              Tüm Portföy ({customers.length})
             </button>
             <button
               onClick={() => {
                 sounds.playTap();
                 setFilterType('credit');
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 filterType === 'credit'
-                  ? 'bg-rose-500 text-white font-bold'
-                  : 'bg-[#141824] text-stone-300 hover:bg-stone-800'
+                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              Borcu Olanlar ({customers.filter((c) => c.creditBalance > 0).length})
+              Açık Hesap / Borçlular ({customers.filter((c) => c.creditBalance > 0).length})
             </button>
             <button
               onClick={() => {
                 sounds.playTap();
                 setFilterType('vip');
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 filterType === 'vip'
-                  ? 'bg-purple-600 text-white font-bold'
-                  : 'bg-[#141824] text-stone-300 hover:bg-stone-800'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              VIP Müşteriler
+              VIP Misafirler
             </button>
           </div>
 
-          <div className="relative w-full sm:w-72">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-500" />
+          <div className="relative w-full sm:w-80">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
               type="text"
-              placeholder="İsim, telefon veya adres..."
+              placeholder="İsim, telefon veya adres ara..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-[#141824] border border-stone-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-stone-200 placeholder-stone-500 focus:outline-none focus:border-amber-500/50"
+              className="w-full bg-[#111827] border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-slate-600 transition-colors"
             />
           </div>
         </div>
       </div>
 
-      {/* Customer Table / Card List */}
-      <div className="flex-1 overflow-y-auto p-4">
+      {/* Customer Cards Grid */}
+      <div className="flex-1 overflow-y-auto p-5">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredCustomers.map((customer) => {
             const hasDebt = customer.creditBalance > 0;
+            const isVip = customer.loyaltyPoints > 200 || customer.totalSpent > 25000;
 
             return (
               <div
                 key={customer.id}
-                className="rounded-3xl bg-[#121622] border border-stone-800/80 p-5 flex flex-col justify-between hover:border-stone-700 transition-all shadow-lg"
+                className="rounded-2xl bg-[#111827] border border-slate-800/80 p-5 flex flex-col justify-between hover:border-slate-700 transition-all shadow-sm group"
               >
                 <div>
-                  {/* Card Header */}
-                  <div className="flex items-start justify-between mb-3">
+                  {/* Card Header: Neutral Slate Avatar + Name + Balance */}
+                  <div className="flex items-start justify-between mb-3.5">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-stone-950 font-black text-sm flex items-center justify-center shadow-md">
+                      <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 text-slate-200 font-bold text-sm flex items-center justify-center shrink-0">
                         {customer.name.charAt(0)}
                       </div>
                       <div>
-                        <h3 className="font-bold text-sm text-stone-100 flex items-center gap-1.5">
-                          <span>{customer.name}</span>
-                          {customer.loyaltyPoints > 200 && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-sm text-slate-100">
+                            {customer.name}
+                          </h3>
+                          {isVip && (
+                            <span className="text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
                               VIP
                             </span>
                           )}
-                        </h3>
-                        <p className="text-xs text-stone-400 font-mono flex items-center gap-1 mt-0.5">
-                          <Phone className="w-3 h-3 text-stone-500" />
+                        </div>
+                        <p className="text-xs text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                          <Phone className="w-3 h-3 text-slate-500" />
                           <span>{customer.phone}</span>
                         </p>
                       </div>
                     </div>
 
                     <div className="text-right">
-                      <div className="text-[10px] text-stone-500">Cari Bakiye</div>
+                      <div className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">Cari Bakiye</div>
                       <div
-                        className={`text-sm font-bold font-mono ${
+                        className={`text-sm font-bold font-mono tabular-nums mt-0.5 ${
                           hasDebt ? 'text-rose-400' : 'text-emerald-400'
                         }`}
                       >
-                        {customer.creditBalance > 0
-                          ? `${customer.creditBalance.toLocaleString('tr-TR')} ₺ Borç`
-                          : 'Temiz'}
+                        {hasDebt
+                          ? `₺${customer.creditBalance.toLocaleString('tr-TR')} Borç`
+                          : 'Temiz (0 ₺)'}
                       </div>
                     </div>
                   </div>
 
                   {/* Customer Info Snippets */}
-                  <div className="space-y-1.5 py-3 border-y border-stone-800/60 text-xs text-stone-300">
+                  <div className="space-y-1.5 py-3 border-y border-slate-800/60 text-xs text-slate-300">
                     <div className="flex items-center gap-2">
-                      <MapPin className="w-3.5 h-3.5 text-stone-500 flex-shrink-0" />
-                      <span className="truncate text-stone-400">{customer.address}</span>
+                      <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                      <span className="truncate text-slate-400">{customer.address}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Mail className="w-3.5 h-3.5 text-stone-500 flex-shrink-0" />
-                      <span className="truncate text-stone-400">{customer.email}</span>
+                      <Mail className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                      <span className="truncate text-slate-400">{customer.email}</span>
                     </div>
                   </div>
 
-                  {/* Stats Grid */}
+                  {/* Tabular Performance Bar */}
                   <div className="grid grid-cols-3 gap-2 py-3 text-center">
-                    <div className="bg-[#161a29] p-2 rounded-xl">
-                      <div className="text-[10px] text-stone-500">Puan</div>
-                      <div className="text-xs font-bold font-mono text-amber-400">
+                    <div className="bg-[#0e1320] p-2.5 rounded-xl border border-slate-800/60">
+                      <div className="text-[10px] font-medium text-slate-500">Puan</div>
+                      <div className="text-xs font-bold font-mono tabular-nums text-amber-400 mt-0.5">
                         {customer.loyaltyPoints}
                       </div>
                     </div>
-                    <div className="bg-[#161a29] p-2 rounded-xl">
-                      <div className="text-[10px] text-stone-500">Sipariş</div>
-                      <div className="text-xs font-bold font-mono text-stone-200">
+                    <div className="bg-[#0e1320] p-2.5 rounded-xl border border-slate-800/60">
+                      <div className="text-[10px] font-medium text-slate-500">Sipariş</div>
+                      <div className="text-xs font-bold font-mono tabular-nums text-slate-200 mt-0.5">
                         {customer.totalOrdersCount}
                       </div>
                     </div>
-                    <div className="bg-[#161a29] p-2 rounded-xl">
-                      <div className="text-[10px] text-stone-500">Ciro</div>
-                      <div className="text-xs font-bold font-mono text-stone-200">
-                        {customer.totalSpent.toLocaleString('tr-TR')} ₺
+                    <div className="bg-[#0e1320] p-2.5 rounded-xl border border-slate-800/60">
+                      <div className="text-[10px] font-medium text-slate-500">Toplam Ciro</div>
+                      <div className="text-xs font-bold font-mono tabular-nums text-slate-200 mt-0.5">
+                        ₺{customer.totalSpent.toLocaleString('tr-TR')}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Card Actions */}
+                {/* Professional Action Buttons (No Hot Pink!) */}
                 <div className="flex items-center gap-2 pt-2">
                   <button
                     onClick={() => handleOpenPoints(customer)}
-                    className="flex-1 py-2 rounded-xl bg-[#181c2b] hover:bg-[#20263a] text-amber-400 font-bold text-xs border border-amber-500/30 flex items-center justify-center gap-1.5 transition-colors"
+                    className="flex-1 py-2 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-amber-300 font-semibold text-xs border border-amber-500/20 flex items-center justify-center gap-1.5 transition-colors"
                   >
                     <Award className="w-3.5 h-3.5" />
                     <span>Puan Ekle</span>
@@ -312,17 +359,18 @@ export default function CustomerManager() {
                   {hasDebt ? (
                     <button
                       onClick={() => handleOpenPayment(customer)}
-                      className="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-md shadow-rose-600/20"
+                      className="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold text-xs border border-slate-700 flex items-center justify-center gap-1.5 transition-colors shadow-sm"
                     >
-                      <CreditCard className="w-3.5 h-3.5" />
-                      <span>Tahsilat Gir</span>
+                      <CreditCard className="w-3.5 h-3.5 text-rose-400" />
+                      <span>Tahsilat Al</span>
                     </button>
                   ) : (
                     <button
                       onClick={() => sounds.playTap()}
-                      className="flex-1 py-2 rounded-xl bg-[#141824] text-stone-400 font-semibold text-xs border border-stone-800 hover:text-stone-200 transition-colors"
+                      className="flex-1 py-2 px-3 rounded-xl bg-slate-900/60 text-slate-400 font-medium text-xs border border-slate-800 hover:text-slate-200 transition-colors flex items-center justify-center gap-1"
                     >
-                      Geçmiş Adisyonlar
+                      <FileText className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Adisyon Geçmişi</span>
                     </button>
                   )}
                 </div>
@@ -334,55 +382,54 @@ export default function CustomerManager() {
 
       {/* Credit Payment Modal */}
       {isPaymentModalOpen && selectedCustomer && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-sm rounded-3xl bg-[#141824] border border-stone-800 p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-stone-800 pb-3">
-              <h3 className="font-bold text-sm text-stone-100 flex items-center gap-2">
-                <Wallet className="w-4 h-4 text-rose-400" />
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-[#111827] border border-slate-800 p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="font-semibold text-sm text-slate-100 flex items-center gap-2">
+                <Wallet className="w-4 h-4 text-amber-400" />
                 <span>Cari Borç Tahsilatı</span>
               </h3>
               <button
                 onClick={() => setIsPaymentModalOpen(false)}
-                className="text-stone-400 hover:text-white"
+                className="text-slate-400 hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div>
-              <p className="text-xs text-stone-400">
-                <strong className="text-stone-200">{selectedCustomer.name}</strong> adlı
-                müşterinin güncel borcu:{' '}
-                <span className="font-mono text-rose-400 font-bold">
-                  {selectedCustomer.creditBalance.toLocaleString('tr-TR')} ₺
-                </span>
-              </p>
+            <div className="bg-[#0e1320] p-3 rounded-xl border border-slate-800/80">
+              <div className="text-xs text-slate-400">Müşteri:</div>
+              <div className="text-sm font-semibold text-slate-200">{selectedCustomer.name}</div>
+              <div className="text-xs text-slate-400 mt-2">Güncel Açık Hesap Bakiyesi:</div>
+              <div className="text-lg font-bold font-mono tabular-nums text-rose-400">
+                ₺{selectedCustomer.creditBalance.toLocaleString('tr-TR')}
+              </div>
             </div>
 
             <div>
-              <label className="text-xs text-stone-400 block mb-1">
-                Tahsil Edilen Miktar (₺)
+              <label className="text-xs font-medium text-slate-400 block mb-1.5">
+                Tahsil Edilen Tutar (₺)
               </label>
               <input
                 type="number"
                 value={paymentAmount}
                 onChange={(e) => setPaymentAmount(e.target.value)}
-                className="w-full bg-[#0e111a] border border-stone-700 rounded-xl px-3 py-2 text-sm font-mono text-stone-100 focus:outline-none focus:border-amber-500"
+                className="w-full bg-[#0e1320] border border-slate-700 rounded-xl px-3 py-2 text-sm font-mono text-slate-100 focus:outline-none focus:border-amber-500"
               />
             </div>
 
             <div className="flex items-center gap-2 pt-2">
               <button
                 onClick={() => setIsPaymentModalOpen(false)}
-                className="flex-1 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold transition-colors"
+                className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-colors"
               >
-                Vazgeç
+                İptal
               </button>
               <button
                 onClick={handleConfirmPayment}
-                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors shadow-lg shadow-emerald-600/20"
+                className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-semibold transition-colors shadow-sm"
               >
-                Tahsilatı Kaydet
+                Tahsilatı Onayla
               </button>
             </div>
           </div>
@@ -391,57 +438,158 @@ export default function CustomerManager() {
 
       {/* Points Modal */}
       {isPointsModalOpen && selectedCustomer && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-sm rounded-3xl bg-[#141824] border border-stone-800 p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-stone-800 pb-3">
-              <h3 className="font-bold text-sm text-stone-100 flex items-center gap-2">
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-[#111827] border border-slate-800 p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="font-semibold text-sm text-slate-100 flex items-center gap-2">
                 <Award className="w-4 h-4 text-amber-400" />
-                <span>Sadakat Puanı Yükle</span>
+                <span>Sadakat Puanı Tanımla</span>
               </h3>
               <button
                 onClick={() => setIsPointsModalOpen(false)}
-                className="text-stone-400 hover:text-white"
+                className="text-slate-400 hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div>
-              <p className="text-xs text-stone-400">
-                <strong className="text-stone-200">{selectedCustomer.name}</strong> mevcut puanı:{' '}
-                <span className="font-mono text-amber-400 font-bold">
-                  {selectedCustomer.loyaltyPoints} Puan
-                </span>
-              </p>
+            <div className="bg-[#0e1320] p-3 rounded-xl border border-slate-800/80">
+              <div className="text-xs text-slate-400">Müşteri:</div>
+              <div className="text-sm font-semibold text-slate-200">{selectedCustomer.name}</div>
+              <div className="text-xs text-slate-400 mt-2">Mevcut Sadakat Puanı:</div>
+              <div className="text-lg font-bold font-mono tabular-nums text-amber-400">
+                {selectedCustomer.loyaltyPoints} Puan
+              </div>
             </div>
 
             <div>
-              <label className="text-xs text-stone-400 block mb-1">
+              <label className="text-xs font-medium text-slate-400 block mb-1.5">
                 Eklenecek Puan
               </label>
               <input
                 type="number"
                 value={pointsToAdd}
                 onChange={(e) => setPointsToAdd(e.target.value)}
-                className="w-full bg-[#0e111a] border border-stone-700 rounded-xl px-3 py-2 text-sm font-mono text-stone-100 focus:outline-none focus:border-amber-500"
+                className="w-full bg-[#0e1320] border border-slate-700 rounded-xl px-3 py-2 text-sm font-mono text-slate-100 focus:outline-none focus:border-amber-500"
               />
             </div>
 
             <div className="flex items-center gap-2 pt-2">
               <button
                 onClick={() => setIsPointsModalOpen(false)}
-                className="flex-1 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold transition-colors"
+                className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-colors"
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleConfirmPoints}
+                className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-semibold transition-colors shadow-sm"
+              >
+                Puanı Kaydet
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* New Customer Modal */}
+      {isNewCustomerModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <form
+            onSubmit={handleCreateCustomer}
+            className="w-full max-w-md rounded-2xl bg-[#111827] border border-slate-800 p-6 shadow-2xl space-y-4"
+          >
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="font-semibold text-sm text-slate-100 flex items-center gap-2">
+                <Users className="w-4 h-4 text-amber-400" />
+                <span>Yeni Cari Müşteri Kaydı</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsNewCustomerModalOpen(false)}
+                className="text-slate-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {newCustError && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{newCustError}</span>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-slate-400 block mb-1">
+                  Müşteri Adı & Soyadı / Kurum Ünvanı *
+                </label>
+                <input
+                  type="text"
+                  placeholder="örn: Selin Yılmaz veya Nova A.Ş."
+                  value={newCustName}
+                  onChange={(e) => setNewCustName(e.target.value)}
+                  className="w-full bg-[#0e1320] border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-slate-400 block mb-1">
+                  Telefon Numarası *
+                </label>
+                <input
+                  type="text"
+                  placeholder="örn: 0532 555 44 33"
+                  value={newCustPhone}
+                  onChange={(e) => setNewCustPhone(e.target.value)}
+                  className="w-full bg-[#0e1320] border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-slate-400 block mb-1">
+                  E-Posta (E-Fatura / Mutabakat)
+                </label>
+                <input
+                  type="email"
+                  placeholder="örn: muhasebe@sirket.com"
+                  value={newCustEmail}
+                  onChange={(e) => setNewCustEmail(e.target.value)}
+                  className="w-full bg-[#0e1320] border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-slate-400 block mb-1">
+                  Adres & İlçe
+                </label>
+                <input
+                  type="text"
+                  placeholder="örn: Teşvikiye Cad. No: 14 Şişli / İstanbul"
+                  value={newCustAddress}
+                  onChange={(e) => setNewCustAddress(e.target.value)}
+                  className="w-full bg-[#0e1320] border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsNewCustomerModalOpen(false)}
+                className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-colors"
               >
                 Vazgeç
               </button>
               <button
-                onClick={handleConfirmPoints}
-                className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold transition-colors shadow-lg shadow-amber-500/20"
+                type="submit"
+                className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-semibold transition-colors shadow-sm"
               >
-                Puanı Ekle
+                Müşteriyi Kaydet
               </button>
             </div>
-          </div>
+          </form>
         </div>
       )}
     </div>

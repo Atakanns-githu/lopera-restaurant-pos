@@ -114,7 +114,7 @@ export default function Navbar() {
       label: 'Hızlı POS',
       icon: <CreditCard className="w-4 h-4" />,
       badge: activeOrdersCount > 0 ? (
-        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500 text-stone-950 font-bold ml-1">
+        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 font-bold ml-1 tabular-nums">
           {activeOrdersCount}
         </span>
       ) : null,
@@ -124,7 +124,7 @@ export default function Navbar() {
       label: 'Mutfak KDS',
       icon: <ChefHat className="w-4 h-4" />,
       badge: kdsPendingCount > 0 ? (
-        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500 text-white font-bold ml-1 animate-pulse">
+        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold ml-1 tabular-nums">
           {kdsPendingCount}
         </span>
       ) : null,
@@ -134,7 +134,7 @@ export default function Navbar() {
       label: 'Paket Servis',
       icon: <Truck className="w-4 h-4" />,
       badge: activeDeliveryCount > 0 ? (
-        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-blue-500 text-white font-bold ml-1">
+        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-semibold ml-1 tabular-nums">
           {activeDeliveryCount}
         </span>
       ) : null,
@@ -167,7 +167,7 @@ export default function Navbar() {
       description: 'Hammadde maliyetleri ve kritik stok',
       icon: <Boxes className="w-4 h-4 text-amber-400" />,
       badge: criticalStockCount > 0 ? (
-        <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-600 text-white font-bold">
+        <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30 font-medium">
           {criticalStockCount} Kritik
         </span>
       ) : null,
@@ -209,7 +209,7 @@ export default function Navbar() {
   const roleMeta = ROLE_DEFINITIONS[currentStaff.role] || ROLE_DEFINITIONS.waiter;
 
   return (
-    <header className="bg-[#0e111a] border-b border-[#1e2433] px-4 py-2.5 flex items-center justify-between sticky top-0 z-40 select-none shadow-xl">
+    <header className="bg-[#0e1320] border-b border-slate-800/80 px-4 py-2.5 flex items-center justify-between sticky top-0 z-40 select-none shadow-md">
       {/* Left: Brand & Quick QR */}
       <div className="flex items-center gap-3">
         <Link
@@ -217,15 +217,15 @@ export default function Navbar() {
           onClick={() => sounds.playTap()}
           className="flex items-center gap-2.5 group"
         >
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/20 border border-amber-400/40">
-            <span className="font-serif font-black text-sm text-stone-950">Z</span>
+          <div className="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 text-amber-400 flex items-center justify-center font-serif font-black text-sm shadow-sm group-hover:border-amber-500/40 transition-colors">
+            L
           </div>
           <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-serif tracking-wider text-sm font-bold text-stone-100 group-hover:text-amber-400 transition-colors">
-                ZADİSYON
+            <div className="flex items-center gap-2">
+              <span className="font-semibold tracking-tight text-sm text-slate-100 group-hover:text-amber-400 transition-colors">
+                LOPERA POS
               </span>
-              <span className="text-amber-400 text-[10px] font-sans font-semibold px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20">
+              <span className="text-slate-300 text-[10px] font-sans font-medium px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700">
                 {currentBranch.name}
               </span>
             </div>
@@ -236,16 +236,16 @@ export default function Navbar() {
           href="/menu"
           target="_blank"
           onClick={() => sounds.playTap()}
-          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold transition-all ml-1"
+          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-medium transition-all ml-1"
           title="Müşteri QR Menüyü Yeni Sekmede Aç"
         >
-          <QrCode className="w-3.5 h-3.5 text-purple-400" />
-          <span>Müşteri QR</span>
+          <QrCode className="w-3.5 h-3.5 text-amber-400" />
+          <span>Müşteri Menüsü</span>
         </Link>
       </div>
 
       {/* Middle: 4 Operational Buttons + "Daha Fazla / Yönetim" Dropdown */}
-      <nav className="flex items-center gap-1.5 bg-[#090b10] p-1 rounded-xl border border-stone-800/80 shadow-inner">
+      <nav className="flex items-center gap-1 bg-[#0b0f17] p-1 rounded-xl border border-slate-800">
         {coreNavItems.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -259,10 +259,10 @@ export default function Navbar() {
               key={item.href}
               href={item.href}
               onClick={() => sounds.playTap()}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                 isActive
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20'
-                  : 'text-stone-300 hover:text-white hover:bg-stone-800/60'
+                  ? 'bg-slate-800 text-white font-semibold border border-slate-700 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/50'
               }`}
             >
               {item.icon}
@@ -280,17 +280,17 @@ export default function Navbar() {
                 sounds.playTap();
                 setIsMoreMenuOpen(!isMoreMenuOpen);
               }}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                 isSecondaryActive
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold'
-                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'
+                  ? 'bg-slate-800 text-amber-300 border border-slate-700 font-semibold shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
               }`}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
               <span>
                 {isSecondaryActive && activeSecondaryItem
                   ? activeSecondaryItem.label
-                  : 'Yönetim & Diğer'}
+                  : 'Yönetim & Modüller'}
               </span>
               <ChevronDown
                 className={`w-3.5 h-3.5 transition-transform duration-200 ${
@@ -301,8 +301,8 @@ export default function Navbar() {
 
             {/* Dropdown Flyout */}
             {isMoreMenuOpen && (
-              <div className="absolute top-full right-0 mt-2 w-72 bg-[#121622] border border-stone-700/80 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-800/80 mb-1 flex items-center justify-between">
+              <div className="absolute top-full right-0 mt-2 w-72 bg-[#111827] border border-slate-700 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-800 mb-1 flex items-center justify-between">
                   <span>Arka Ofis & Yönetim</span>
                   <span className="text-amber-400">{currentStaff.role.toUpperCase()}</span>
                 </div>
@@ -319,11 +319,11 @@ export default function Navbar() {
                         }}
                         className={`flex items-start gap-3 p-2.5 rounded-xl transition-all ${
                           isItemActive
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold'
-                            : 'hover:bg-stone-800/70 text-stone-300 hover:text-white'
+                            ? 'bg-slate-800 text-amber-300 border border-slate-700 font-semibold'
+                            : 'hover:bg-slate-800/60 text-slate-300 hover:text-white'
                         }`}
                       >
-                        <div className="p-1.5 rounded-lg bg-[#0a0d14] border border-stone-800 shrink-0 mt-0.5">
+                        <div className="p-1.5 rounded-lg bg-[#0e1320] border border-slate-800 shrink-0 mt-0.5">
                           {item.icon}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -331,7 +331,7 @@ export default function Navbar() {
                             <span className="text-xs font-semibold">{item.label}</span>
                             {item.badge}
                           </div>
-                          <p className="text-[10px] text-stone-400 truncate mt-0.5">
+                          <p className="text-[10px] text-slate-400 truncate mt-0.5">
                             {item.description}
                           </p>
                         </div>
@@ -348,8 +348,8 @@ export default function Navbar() {
       {/* Right Controls: Clock, Sound, Lock, Logout, Staff Profile */}
       <div className="flex items-center gap-2">
         {/* Clock */}
-        <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#141824] border border-stone-800/80 text-stone-300 font-mono text-xs">
-          <Clock className="w-3.5 h-3.5 text-amber-400" />
+        <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#111827] border border-slate-800 text-slate-300 font-mono text-xs tabular-nums">
+          <Clock className="w-3.5 h-3.5 text-slate-400" />
           <span>{time || '20:15'}</span>
         </div>
 
@@ -357,7 +357,7 @@ export default function Navbar() {
         <button
           onClick={toggleSound}
           title={isMuted ? 'Sesi Aç' : 'Sesi Kapat'}
-          className="p-1.5 rounded-lg bg-[#141824] border border-stone-800 text-stone-300 hover:text-white hover:border-stone-700 transition-colors"
+          className="p-1.5 rounded-lg bg-[#111827] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
         >
           {isMuted ? (
             <VolumeX className="w-4 h-4 text-rose-400" />
@@ -370,7 +370,7 @@ export default function Navbar() {
         <button
           onClick={handleLock}
           title="Terminal Ekranını Kilitle"
-          className="p-1.5 rounded-lg bg-[#141824] border border-stone-800 text-stone-300 hover:text-amber-400 hover:border-amber-500/40 transition-colors"
+          className="p-1.5 rounded-lg bg-[#111827] border border-slate-800 text-slate-300 hover:text-amber-400 hover:border-amber-500/40 transition-colors"
         >
           <Lock className="w-4 h-4" />
         </button>
@@ -379,7 +379,7 @@ export default function Navbar() {
         <button
           onClick={handleLogout}
           title="Oturumu Kapat ve Çıkış Yap"
-          className="p-1.5 rounded-lg bg-[#141824] border border-stone-800 text-stone-400 hover:text-rose-400 hover:border-rose-500/40 transition-colors"
+          className="p-1.5 rounded-lg bg-[#111827] border border-slate-800 text-slate-400 hover:text-rose-400 hover:border-rose-500/40 transition-colors"
         >
           <LogOut className="w-4 h-4" />
         </button>
@@ -390,7 +390,7 @@ export default function Navbar() {
             sounds.playTap();
             setIsPinModalOpen(true);
           }}
-          className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl bg-[#141824] border border-stone-800 hover:border-amber-500/40 transition-all text-left group"
+          className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl bg-[#111827] border border-slate-800 hover:border-slate-700 transition-all text-left group"
         >
           <div
             className={`w-6 h-6 rounded-lg ${currentStaff.avatarBg} text-white flex items-center justify-center font-bold text-xs shadow-sm`}
@@ -398,7 +398,7 @@ export default function Navbar() {
             {currentStaff.name.charAt(0)}
           </div>
           <div className="hidden sm:block">
-            <div className="text-xs font-semibold text-stone-200 group-hover:text-amber-400 transition-colors truncate max-w-[110px]">
+            <div className="text-xs font-semibold text-slate-200 group-hover:text-amber-400 transition-colors truncate max-w-[110px]">
               {currentStaff.name}
             </div>
             <div className="text-[9px] text-amber-400 font-medium">

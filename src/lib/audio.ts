@@ -172,6 +172,11 @@ class SoundManager {
     } catch {}
   }
 
+  // Alias for printer sound
+  public playPrinter() {
+    this.playPrintReceipt();
+  }
+
   // KDS Kitchen urgent bell
   public playKitchenAlert() {
     if (this.isMuted) return;

@@ -140,6 +140,7 @@ interface POSContextType {
   // Customer Actions
   addLoyaltyPoints: (customerId: string, points: number) => void;
   recordCreditPayment: (customerId: string, amount: number) => void;
+  addCustomer: (customer: Customer) => void;
 
   // Authentication & RBAC & Security
   isAuthenticated: boolean;
@@ -879,6 +880,12 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const addCustomer = (customer: Customer) => {
+    sounds.playTap();
+    setCustomers((prev) => [customer, ...prev]);
+    addAuditLog('Cari Müşteri Eklendi', `${customer.name} sisteme yeni cari kart olarak kaydedildi.`, 'info');
+  };
+
   return (
     <POSContext.Provider
       value={{
@@ -938,6 +945,7 @@ export function POSProvider({ children }: { children: React.ReactNode }) {
         addDeliveryOrder,
         addLoyaltyPoints,
         recordCreditPayment,
+        addCustomer,
         isAuthenticated,
         sessionToken,
         isScreenLocked,

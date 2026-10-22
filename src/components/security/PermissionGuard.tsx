@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { usePOS } from '@/lib/store';
 import { canAccessModule, getRequiredRoleForPath, ROLE_DEFINITIONS } from '@/lib/rbac';
 import { sounds } from '@/lib/audio';
-import { ShieldAlert, KeyRound, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ShieldAlert, KeyRound, ArrowLeft, AlertCircle } from 'lucide-react';
 
 export default function PermissionGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -49,7 +49,7 @@ export default function PermissionGuard({ children }: { children: React.ReactNod
 
   const handleVerifyOverride = async () => {
     if (managerPin.length !== 4) {
-      setErrorMsg('Lütfen 4 haneli müdür PIN giriniz');
+      setErrorMsg('Lütfen 4 haneli yetkili PIN kodunu giriniz');
       return;
     }
 
@@ -68,56 +68,53 @@ export default function PermissionGuard({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center p-6 bg-[#090b10] select-none">
-      <div className="max-w-md w-full bg-[#121624] border border-rose-500/30 rounded-3xl p-8 shadow-2xl text-center space-y-6 relative overflow-hidden">
-        {/* Glow accent */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-gradient-to-r from-transparent via-rose-500 to-transparent shadow-[0_0_20px_#f43f5e]" />
-
+    <div className="flex-1 flex items-center justify-center p-6 bg-[#0b0f17] select-none">
+      <div className="max-w-md w-full bg-[#0e1320] border border-slate-800 rounded-2xl p-7 shadow-2xl text-center space-y-6 relative overflow-hidden">
         {/* Shield Icon */}
-        <div className="w-16 h-16 mx-auto rounded-3xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 shadow-lg shadow-rose-500/10">
-          <ShieldAlert className="w-8 h-8 animate-pulse" />
+        <div className="w-14 h-14 mx-auto rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+          <ShieldAlert className="w-7 h-7" />
         </div>
 
         {/* Title & Info */}
-        <div className="space-y-2">
-          <span className="text-[11px] font-bold tracking-widest text-rose-400 uppercase">
+        <div className="space-y-1.5">
+          <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
             GÜVENLİK PROTOKOLÜ • ERİŞİM KISITLANDI
           </span>
-          <h2 className="text-xl font-extrabold text-stone-100 font-serif">
+          <h2 className="text-lg font-semibold text-slate-100">
             Yetkisiz Modül Girişi
           </h2>
-          <p className="text-xs text-stone-400 leading-relaxed">
+          <p className="text-xs text-slate-400 leading-relaxed">
             Mevcut kullanıcı profiliniz bu alana erişim yetkisine sahip değildir.
           </p>
         </div>
 
         {/* Active Staff Badge & Required Role */}
-        <div className="p-3.5 rounded-2xl bg-[#181d2e] border border-stone-800 text-left space-y-2">
+        <div className="p-3.5 rounded-xl bg-[#111827] border border-slate-800 text-left space-y-2">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-stone-400">Giriş Yapan:</span>
-            <span className="font-bold text-stone-200">{currentStaff.name}</span>
+            <span className="text-slate-400">Giriş Yapan:</span>
+            <span className="font-semibold text-slate-200">{currentStaff.name}</span>
           </div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-stone-400">Mevcut Rol:</span>
-            <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${roleMeta.badgeBg}`}>
+            <span className="text-slate-400">Mevcut Rol:</span>
+            <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${roleMeta.badgeBg}`}>
               {roleMeta.badgeText}
             </span>
           </div>
-          <div className="flex items-center justify-between text-xs pt-1 border-t border-stone-800/80">
-            <span className="text-stone-400">Gereken Yetki:</span>
-            <span className="font-bold text-amber-400">{requiredRoleTitle}</span>
+          <div className="flex items-center justify-between text-xs pt-1.5 border-t border-slate-800/80">
+            <span className="text-slate-400">Gereken Asgari Rol:</span>
+            <span className="font-semibold text-amber-400">{requiredRoleTitle}</span>
           </div>
         </div>
 
         {/* Action Buttons */}
         {!isOverrideOpen ? (
-          <div className="space-y-3 pt-2">
+          <div className="space-y-2.5 pt-1">
             <button
               onClick={() => {
                 sounds.playTap();
                 setIsOverrideOpen(true);
               }}
-              className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all active:scale-98"
+              className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm"
             >
               <KeyRound className="w-4 h-4" />
               <span>Yönetici PIN Onayı (Supervisor Override)</span>
@@ -128,7 +125,7 @@ export default function PermissionGuard({ children }: { children: React.ReactNod
                 sounds.playTap();
                 router.push('/terminal/tables');
               }}
-              className="w-full py-3 rounded-2xl bg-[#181d2e] hover:bg-[#222942] border border-stone-800 text-stone-300 font-semibold text-xs flex items-center justify-center gap-2 transition-all"
+              className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white font-medium text-xs flex items-center justify-center gap-2 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Yetkili Olduğum Sayfaya Dön</span>
@@ -136,28 +133,28 @@ export default function PermissionGuard({ children }: { children: React.ReactNod
           </div>
         ) : (
           /* Supervisor PIN Keypad Modal */
-          <div className="space-y-4 pt-2 border-t border-stone-800/80 animate-in fade-in">
-            <div className="text-xs text-amber-400 font-semibold flex items-center justify-center gap-1.5">
+          <div className="space-y-4 pt-2 border-t border-slate-800/80 animate-in fade-in duration-150">
+            <div className="text-xs text-amber-400 font-medium flex items-center justify-center gap-1.5">
               <KeyRound className="w-4 h-4" />
-              <span>Müdür / Patron PIN Kodunu Giriniz</span>
+              <span>Müdür / Yönetici PIN Kodunu Giriniz</span>
             </div>
 
             {/* PIN Dots */}
-            <div className="flex justify-center gap-3 py-2">
+            <div className="flex justify-center gap-3 py-1">
               {[0, 1, 2, 3].map((idx) => (
                 <div
                   key={idx}
                   className={`w-3.5 h-3.5 rounded-full border transition-all ${
                     managerPin.length > idx
-                      ? 'bg-amber-400 border-amber-400 scale-110 shadow-md shadow-amber-400/40'
-                      : 'border-stone-700 bg-stone-900'
+                      ? 'bg-amber-400 border-amber-400 scale-110 shadow-sm shadow-amber-400/40'
+                      : 'border-slate-700 bg-slate-800'
                   }`}
                 />
               ))}
             </div>
 
             {errorMsg && (
-              <div className="text-xs text-rose-400 font-semibold flex items-center justify-center gap-1.5">
+              <div className="text-xs text-rose-400 font-medium flex items-center justify-center gap-1.5">
                 <AlertCircle className="w-3.5 h-3.5" />
                 <span>{errorMsg}</span>
               </div>
@@ -169,26 +166,26 @@ export default function PermissionGuard({ children }: { children: React.ReactNod
                 <button
                   key={digit}
                   onClick={() => handleDigit(digit)}
-                  className="h-10 rounded-xl bg-[#181d2e] hover:bg-[#222942] text-stone-100 font-mono font-bold text-sm border border-stone-800 transition-all active:scale-95"
+                  className="h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-mono font-semibold text-sm border border-slate-700 transition-colors"
                 >
                   {digit}
                 </button>
               ))}
               <button
                 onClick={handleClear}
-                className="h-10 rounded-xl bg-[#181d2e] text-stone-400 font-bold text-[11px] border border-stone-800"
+                className="h-10 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 font-medium text-xs border border-slate-700 transition-colors"
               >
                 Sil
               </button>
               <button
                 onClick={() => handleDigit('0')}
-                className="h-10 rounded-xl bg-[#181d2e] hover:bg-[#222942] text-stone-100 font-mono font-bold text-sm border border-stone-800 transition-all active:scale-95"
+                className="h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-mono font-semibold text-sm border border-slate-700 transition-colors"
               >
                 0
               </button>
               <button
                 onClick={handleDelete}
-                className="h-10 rounded-xl bg-[#181d2e] text-stone-400 font-bold text-[11px] border border-stone-800"
+                className="h-10 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 font-medium text-xs border border-slate-700 transition-colors"
               >
                 ←
               </button>
@@ -202,13 +199,13 @@ export default function PermissionGuard({ children }: { children: React.ReactNod
                   setManagerPin('');
                   setErrorMsg(null);
                 }}
-                className="flex-1 py-2.5 rounded-xl bg-stone-800 text-stone-300 font-semibold text-xs"
+                className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs border border-slate-700 transition-colors"
               >
                 Vazgeç
               </button>
               <button
                 onClick={handleVerifyOverride}
-                className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs"
+                className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs shadow-sm transition-colors"
               >
                 Onayla
               </button>

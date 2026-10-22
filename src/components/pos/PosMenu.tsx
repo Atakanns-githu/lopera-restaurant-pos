@@ -30,20 +30,20 @@ export default function PosMenu() {
   const getCategoryIcon = (iconName: string) => {
     switch (iconName) {
       case 'Soup':
-        return <Soup className="w-4 h-4" />;
+        return <Soup className="w-3.5 h-3.5" />;
       case 'Flame':
-        return <Flame className="w-4 h-4" />;
+        return <Flame className="w-3.5 h-3.5" />;
       case 'Wheat':
-        return <Wheat className="w-4 h-4" />;
+        return <Wheat className="w-3.5 h-3.5" />;
       case 'Pizza':
-        return <Pizza className="w-4 h-4" />;
+        return <Pizza className="w-3.5 h-3.5" />;
       case 'GlassWater':
-        return <GlassWater className="w-4 h-4" />;
+        return <GlassWater className="w-3.5 h-3.5" />;
       case 'Wine':
-        return <Wine className="w-4 h-4" />;
+        return <Wine className="w-3.5 h-3.5" />;
       case 'CakeSlice':
       default:
-        return <CakeSlice className="w-4 h-4" />;
+        return <CakeSlice className="w-3.5 h-3.5" />;
     }
   };
 
@@ -79,23 +79,23 @@ export default function PosMenu() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0d1017] border-r border-stone-800/80 overflow-hidden select-none">
+    <div className="flex-1 flex flex-col h-full bg-[#0b0f17] border-r border-slate-800/80 overflow-hidden select-none">
       {/* Top Search & Category Bar */}
-      <div className="p-3.5 border-b border-stone-800 bg-[#121622]/80 backdrop-blur-md space-y-3">
+      <div className="p-4 border-b border-slate-800 bg-[#0e1320] space-y-3">
         {/* Search Input */}
         <div className="relative">
-          <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Menüde ara (Antrikot, Tiramisu, Şarap, Burrata)..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#090b10] border border-stone-800 text-xs text-stone-100 placeholder-stone-500 focus:outline-none focus:border-amber-500 transition-colors"
+            placeholder="Menüde ara (Antrikot, Burrata, Risotto, Tiramisu)..."
+            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#111827] border border-slate-800 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-slate-700 transition-colors"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-stone-400 hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
             >
               ✕
             </button>
@@ -114,10 +114,10 @@ export default function PosMenu() {
                     sounds.playTap();
                     setSelectedCategoryId(cat.id);
                   }}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
                     isSelected
-                      ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20'
-                      : 'bg-[#181c2a] text-stone-300 border border-stone-800/80 hover:border-stone-700 hover:text-white'
+                      ? 'bg-slate-800 text-slate-100 font-semibold border border-slate-700 shadow-sm'
+                      : 'bg-[#111827] text-slate-400 border border-slate-800/80 hover:border-slate-700 hover:text-slate-200'
                   }`}
                 >
                   {getCategoryIcon(cat.icon)}
@@ -129,7 +129,7 @@ export default function PosMenu() {
         )}
       </div>
 
-      {/* Food Cards Grid */}
+      {/* Culinary Food Cards Grid */}
       <div className="flex-1 p-4 overflow-y-auto">
         {filteredItems.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -137,37 +137,37 @@ export default function PosMenu() {
               <div
                 key={item.id}
                 onClick={() => handleItemClick(item)}
-                className="group p-3.5 rounded-2xl bg-[#131724] border border-stone-800/80 hover:border-amber-500/50 hover:bg-[#181e30] transition-all cursor-pointer flex flex-col justify-between shadow-sm active:scale-[0.98]"
+                className="group p-4 rounded-2xl bg-[#111827] border border-slate-800/80 hover:border-slate-700 hover:bg-[#141d30] transition-all cursor-pointer flex flex-col justify-between shadow-sm active:scale-[0.98]"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-1.5">
-                    <h4 className="text-sm font-bold text-stone-100 group-hover:text-amber-400 transition-colors">
+                    <h4 className="text-sm font-semibold text-slate-100 group-hover:text-amber-400 transition-colors">
                       {item.name}
                     </h4>
-                    <span className="text-xs font-bold text-amber-400 font-mono whitespace-nowrap">
-                      {item.price.toLocaleString('tr-TR')} ₺
+                    <span className="text-xs font-bold text-amber-400 font-mono tabular-nums whitespace-nowrap">
+                      ₺{item.price.toLocaleString('tr-TR')}
                     </span>
                   </div>
 
-                  <p className="text-xs text-stone-400 line-clamp-2 leading-relaxed mb-3">
+                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-3">
                     {item.description}
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-stone-800/60">
-                  <div className="flex items-center gap-2 text-[11px] text-stone-400">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-stone-500" />
+                <div className="flex items-center justify-between pt-2.5 border-t border-slate-800/70">
+                  <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                    <span className="flex items-center gap-1 font-mono">
+                      <Clock className="w-3 h-3 text-slate-500" />
                       <span>{item.prepTimeMinutes} dk</span>
                     </span>
                     {item.modifiers && item.modifiers.length > 0 && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">
-                        Seçenekli
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 font-medium">
+                        Opsiyonel
                       </span>
                     )}
                   </div>
 
-                  <div className="w-7 h-7 rounded-lg bg-stone-800 group-hover:bg-amber-500 text-stone-300 group-hover:text-stone-950 flex items-center justify-center transition-colors shadow-sm">
+                  <div className="w-7 h-7 rounded-lg bg-slate-800 group-hover:bg-amber-500 text-slate-300 group-hover:text-slate-950 flex items-center justify-center transition-colors shadow-sm">
                     <Plus className="w-4 h-4 font-bold" />
                   </div>
                 </div>
@@ -175,7 +175,7 @@ export default function PosMenu() {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-48 text-stone-400 text-xs">
+          <div className="flex flex-col items-center justify-center h-48 text-slate-400 text-xs">
             <p>Aradığınız kriterlere uygun ürün bulunamadı.</p>
           </div>
         )}

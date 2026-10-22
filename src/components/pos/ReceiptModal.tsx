@@ -22,7 +22,7 @@ export default function ReceiptModal() {
   const handleEscPosDownload = () => {
     sounds.playPrintReceipt();
     const bytes = generateEscPosReceipt(order, {
-      branchName: currentBranch?.name || 'ZADİSYON NİŞANTAŞI',
+      branchName: currentBranch?.name || 'LOPERA NİŞANTAŞI',
     });
     downloadEscPosFile(bytes, `adisyon_${order.tableNumber}.prn`);
   };
@@ -30,7 +30,7 @@ export default function ReceiptModal() {
   const handleWebSerialPrint = async () => {
     sounds.playTap();
     const bytes = generateEscPosReceipt(order, {
-      branchName: currentBranch?.name || 'ZADİSYON NİŞANTAŞI',
+      branchName: currentBranch?.name || 'LOPERA NİŞANTAŞI',
     });
     await printViaWebSerial(bytes);
   };
@@ -41,7 +41,7 @@ export default function ReceiptModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm select-none">
       <div className="flex flex-col items-center max-w-sm w-full">
         {/* Printable Thermal Receipt Slip */}
         <div className="thermal-receipt w-full rounded-lg overflow-hidden shadow-2xl p-6 text-stone-900 font-mono text-xs select-text">
@@ -50,24 +50,24 @@ export default function ReceiptModal() {
 
           {/* Restaurant Header */}
           <div className="text-center pb-3 border-b border-dashed border-stone-400 space-y-1">
-            <h2 className="font-serif font-black text-base tracking-widest text-stone-900">
-              ZADİSYON
+            <h2 className="font-semibold text-base tracking-widest text-stone-900">
+              LOPERA RESTAURANT
             </h2>
             <p className="text-[10px] text-stone-700 font-bold uppercase">
               {currentBranch?.name || 'NİŞANTAŞI (MERKEZ)'}
             </p>
             <p className="text-[9px] text-stone-500">Abdi İpekçi Cad. No: 42 Nişantaşı / İSTANBUL</p>
-            <p className="text-[9px] text-stone-500">VKN: 9480128491 • V.D.: BEYOĞLU</p>
+            <p className="text-[9px] text-stone-500 font-mono">VKN: 9480128491 • V.D.: BEYOĞLU</p>
           </div>
 
           {/* Ticket Meta */}
-          <div className="py-2.5 border-b border-dashed border-stone-400 space-y-1 text-[11px]">
+          <div className="py-2.5 border-b border-dashed border-stone-400 space-y-1 text-[11px] tabular-nums">
             <div className="flex justify-between">
               <span className="font-bold">MASA: {order.tableNumber}</span>
               <span>KİŞİ: {order.guestCount}</span>
             </div>
             <div className="flex justify-between">
-              <span>ADİSYON NO: #{order.id.slice(-6).toUpperCase()}</span>
+              <span>ADİSYON: #{order.id.slice(-6).toUpperCase()}</span>
               <span>
                 TARİH:{' '}
                 {new Date(order.createdAt).toLocaleDateString('tr-TR', {
@@ -90,7 +90,7 @@ export default function ReceiptModal() {
           </div>
 
           {/* Itemized Lines */}
-          <div className="py-3 border-b border-dashed border-stone-400 space-y-2">
+          <div className="py-3 border-b border-dashed border-stone-400 space-y-2 tabular-nums">
             <div className="flex justify-between text-[10px] font-bold text-stone-600 border-b border-stone-300 pb-1">
               <span>ÜRÜN</span>
               <span>ADET x FİYAT</span>
@@ -132,40 +132,40 @@ export default function ReceiptModal() {
           </div>
 
           {/* Totals & Tax */}
-          <div className="py-2.5 space-y-1 text-xs">
+          <div className="py-2.5 space-y-1 text-xs tabular-nums">
             <div className="flex justify-between text-stone-700">
               <span>ARA TOPLAM:</span>
-              <span>{order.subtotal.toLocaleString('tr-TR')} ₺</span>
+              <span>₺{order.subtotal.toLocaleString('tr-TR')}</span>
             </div>
 
             {order.coverCharge > 0 && (
               <div className="flex justify-between text-stone-700">
                 <span>KUVER BEDELİ:</span>
-                <span>+{order.coverCharge.toLocaleString('tr-TR')} ₺</span>
+                <span>+₺{order.coverCharge.toLocaleString('tr-TR')}</span>
               </div>
             )}
 
             {order.discountAmount > 0 && (
               <div className="flex justify-between text-emerald-800 font-bold">
                 <span>İSKONTO (%{order.discountRate}):</span>
-                <span>-{order.discountAmount.toLocaleString('tr-TR')} ₺</span>
+                <span>-₺{order.discountAmount.toLocaleString('tr-TR')}</span>
               </div>
             )}
 
             <div className="flex justify-between text-[10px] text-stone-500">
               <span>KDV (%10 Dahil):</span>
-              <span>{Math.round(order.total * 0.1).toLocaleString('tr-TR')} ₺</span>
+              <span>₺{Math.round(order.total * 0.1).toLocaleString('tr-TR')}</span>
             </div>
 
-            <div className="flex justify-between text-base font-black pt-1 border-t-2 border-stone-900 mt-1">
+            <div className="flex justify-between text-base font-bold pt-1 border-t-2 border-stone-900 mt-1">
               <span>TOPLAM TUTAR:</span>
-              <span>{order.total.toLocaleString('tr-TR')} ₺</span>
+              <span>₺{order.total.toLocaleString('tr-TR')}</span>
             </div>
           </div>
 
           {/* Payment Records */}
           {order.payments.length > 0 && (
-            <div className="py-2 border-t border-dashed border-stone-400 space-y-1 text-[10px] text-stone-700">
+            <div className="py-2 border-t border-dashed border-stone-400 space-y-1 text-[10px] text-stone-700 tabular-nums">
               <div className="font-bold">ÖDEME BİLGİSİ:</div>
               {order.payments.map((p) => (
                 <div key={p.id} className="flex justify-between">
@@ -175,7 +175,7 @@ export default function ReceiptModal() {
                     {p.method === 'meal_voucher' && 'Yemek Kartı'}
                     {p.method === 'online' && 'FAST / QR'}
                   </span>
-                  <span className="font-mono font-bold">{p.amount.toLocaleString('tr-TR')} ₺</span>
+                  <span className="font-mono font-bold">₺{p.amount.toLocaleString('tr-TR')}</span>
                 </div>
               ))}
             </div>
@@ -188,11 +188,11 @@ export default function ReceiptModal() {
                 <QrCode className="w-14 h-14" />
               </div>
             </div>
-            <p className="text-[9px] text-stone-500 font-semibold">
-              509 VUK GİB e-Adisyon Bilgi Fişidir
+            <p className="text-[9px] text-stone-500 font-semibold font-mono">
+              509 VUK GİB e-Adisyon Resmi Bilgi Fişi
             </p>
-            <p className="text-[10px] font-bold tracking-widest text-stone-800">
-              BİZİ TERCİH ETTİĞİNİZ İÇİN TEŞEKKÜR EDERİZ
+            <p className="text-[10px] font-semibold tracking-wider text-stone-800 uppercase">
+              Bizi Tercih Ettiğiniz İçin Teşekkür Ederiz
             </p>
           </div>
 
@@ -205,7 +205,7 @@ export default function ReceiptModal() {
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={handleEscPosDownload}
-              className="py-2.5 px-3 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold border border-stone-700 flex items-center justify-center gap-1.5 transition-colors"
+              className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 flex items-center justify-center gap-1.5 transition-colors"
               title="Termal Yazıcıya ESC/POS Bayt Dosyası (.prn) İndir"
             >
               <Download className="w-3.5 h-3.5 text-amber-400" />
@@ -214,7 +214,7 @@ export default function ReceiptModal() {
 
             <button
               onClick={handleDownloadXml}
-              className="py-2.5 px-3 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold border border-stone-700 flex items-center justify-center gap-1.5 transition-colors"
+              className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 flex items-center justify-center gap-1.5 transition-colors"
               title="GİB UBL-TR 2.1 E-Adisyon XML İndir"
             >
               <FileCode className="w-3.5 h-3.5 text-blue-400" />
@@ -228,17 +228,17 @@ export default function ReceiptModal() {
                 sounds.playTap();
                 setIsReceiptModalOpen(false);
               }}
-              className="flex-1 py-3 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 font-semibold text-xs transition-colors"
+              className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition-colors border border-slate-700"
             >
               Kapat
             </button>
 
             <button
               onClick={handlePrint}
-              className="flex-2 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-xs shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition-all active:scale-95"
+              className="flex-2 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs shadow-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
             >
               <Printer className="w-4 h-4" />
-              <span>Yazdır (ESC/POS & Termal)</span>
+              <span>Yazdır (Termal ESC/POS)</span>
             </button>
           </div>
         </div>

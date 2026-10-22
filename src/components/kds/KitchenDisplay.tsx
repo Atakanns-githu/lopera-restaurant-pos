@@ -38,9 +38,9 @@ export default function KitchenDisplay() {
       case 'cold_kitchen':
         return <Soup className="w-3.5 h-3.5 text-teal-400" />;
       case 'bar':
-        return <Wine className="w-3.5 h-3.5 text-purple-400" />;
+        return <Wine className="w-3.5 h-3.5 text-amber-400" />;
       case 'pastry':
-        return <CakeSlice className="w-3.5 h-3.5 text-amber-400" />;
+        return <CakeSlice className="w-3.5 h-3.5 text-amber-300" />;
     }
   };
 
@@ -49,22 +49,22 @@ export default function KitchenDisplay() {
 
     if (elapsedMinutes > 20) {
       return (
-        <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg bg-rose-600 text-white animate-pulse flex items-center gap-1 shadow-md shadow-rose-600/30">
+        <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1">
           <AlertTriangle className="w-3.5 h-3.5" />
-          <span>{elapsedMinutes} dk (ACİL!)</span>
+          <span>{elapsedMinutes} dk (Gecikme)</span>
         </span>
       );
     }
     if (elapsedMinutes > 10) {
       return (
-        <span className="text-[11px] font-mono font-bold px-2 py-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1">
+        <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/25 flex items-center gap-1">
           <Clock className="w-3.5 h-3.5" />
           <span>{elapsedMinutes} dk</span>
         </span>
       );
     }
     return (
-      <span className="text-[11px] font-mono font-bold px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+      <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1">
         <Clock className="w-3.5 h-3.5" />
         <span>{elapsedMinutes} dk</span>
       </span>
@@ -93,21 +93,21 @@ export default function KitchenDisplay() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0a0d14] p-5 overflow-y-auto select-none">
+    <div className="flex-1 flex flex-col h-full bg-[#0b0f17] p-5 overflow-y-auto select-none">
       {/* Top Station Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-lg font-bold text-stone-100 flex items-center gap-2">
+          <h1 className="text-base font-semibold text-slate-100 flex items-center gap-2">
             <ChefHat className="w-5 h-5 text-amber-400" />
             <span>Mutfak & Bar KDS (Kitchen Display System)</span>
-          </h2>
-          <p className="text-xs text-stone-400">
-            Gelen sipariş biletleri, istasyon hazırlık süreleri ve servis akışı
+          </h1>
+          <p className="text-xs text-slate-400 mt-0.5">
+            İstasyon bazlı üretim biletleri, hazırlık süreleri ve servis koordinasyonu
           </p>
         </div>
 
         {/* Station Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#121622] border border-stone-800">
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-[#111827] border border-slate-800">
           {[
             { id: 'all', name: 'Tüm İstasyonlar' },
             { id: 'hot_kitchen', name: 'Sıcak Mutfak' },
@@ -121,10 +121,10 @@ export default function KitchenDisplay() {
                 sounds.playTap();
                 setSelectedStation(tab.id as KitchenStation | 'all');
               }}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 selectedStation === tab.id
-                  ? 'bg-amber-500 text-stone-950 font-bold shadow-sm'
-                  : 'text-stone-300 hover:text-white hover:bg-stone-800/60'
+                  ? 'bg-slate-800 text-white font-semibold border border-slate-700 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               {tab.name}
@@ -133,7 +133,7 @@ export default function KitchenDisplay() {
         </div>
       </div>
 
-      {/* Tickets Masonry / Horizontal Flow */}
+      {/* Tickets Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {activeOrders.map((order) => {
           // Filter items by station if selected
@@ -151,21 +151,21 @@ export default function KitchenDisplay() {
           return (
             <div
               key={order.id}
-              className={`rounded-2xl border p-4 flex flex-col justify-between transition-all shadow-xl ${
+              className={`rounded-2xl border p-4.5 flex flex-col justify-between transition-all shadow-sm ${
                 isAllReady
-                  ? 'bg-[#101b17] border-emerald-500/40'
-                  : 'bg-[#121622] border-stone-800/80'
+                  ? 'bg-[#101b17] border-emerald-500/30'
+                  : 'bg-[#111827] border-slate-800/80 hover:border-slate-700'
               }`}
             >
               {/* Ticket Top Header */}
               <div>
-                <div className="flex items-center justify-between pb-3 border-b border-stone-800/90 mb-3">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-base font-extrabold text-stone-100">
+                      <span className="text-base font-semibold text-slate-100">
                         {order.tableNumber}
                       </span>
-                      <span className="text-xs text-stone-400">
+                      <span className="text-xs text-slate-400 font-medium">
                         {order.section === 'ana_salon' && 'Ana Salon'}
                         {order.section === 'teras' && 'Teras'}
                         {order.section === 'vip' && 'VIP'}
@@ -173,7 +173,7 @@ export default function KitchenDisplay() {
                         {order.section === 'bar' && 'Bar'}
                       </span>
                     </div>
-                    <div className="text-[11px] text-stone-400 mt-0.5">
+                    <div className="text-[11px] text-slate-400 mt-0.5">
                       Garson: {order.waiterName} • {order.guestCount} Kişi
                     </div>
                   </div>
@@ -189,30 +189,30 @@ export default function KitchenDisplay() {
                       onClick={() => handleNextStatus(order.id, item)}
                       className={`p-2.5 rounded-xl border transition-all cursor-pointer select-none ${
                         item.status === 'ready'
-                          ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-200'
+                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
                           : item.status === 'preparing'
-                          ? 'bg-amber-500/15 border-amber-500/40 text-amber-200'
-                          : 'bg-[#191e2e] border-stone-800 text-stone-200 hover:border-stone-700'
+                          ? 'bg-amber-500/10 border-amber-500/30 text-amber-200'
+                          : 'bg-[#0e1320] border-slate-800 text-slate-200 hover:border-slate-700'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-stone-900 font-mono text-xs font-bold text-amber-400 flex items-center justify-center">
+                          <span className="w-5 h-5 rounded bg-slate-800 font-mono text-xs font-bold text-amber-400 flex items-center justify-center">
                             {item.quantity}x
                           </span>
-                          <span className="text-xs font-bold">{item.name}</span>
+                          <span className="text-xs font-medium text-slate-100">{item.name}</span>
                         </div>
 
                         <span
-                          className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                          className={`text-[9px] px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${
                             item.status === 'ready'
-                              ? 'bg-emerald-500 text-stone-950 font-extrabold'
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                               : item.status === 'preparing'
-                              ? 'bg-amber-500 text-stone-950'
-                              : 'bg-stone-800 text-stone-400'
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                              : 'bg-slate-800 text-slate-400'
                           }`}
                         >
-                          {item.status === 'ready' && 'HAZIR!'}
+                          {item.status === 'ready' && 'HAZIR'}
                           {item.status === 'preparing' && 'PİŞİYOR'}
                           {item.status === 'pending' && 'BEKLİYOR'}
                           {item.status === 'served' && 'SERVİS EDİLDİ'}
@@ -221,7 +221,7 @@ export default function KitchenDisplay() {
 
                       {/* Modifiers & Notes */}
                       {item.selectedModifiers.length > 0 && (
-                        <div className="text-[10px] text-amber-400/90 pl-7 mt-1">
+                        <div className="text-[10px] text-amber-400/80 pl-7 mt-1 font-mono">
                           {item.selectedModifiers.map((m, i) => (
                             <span key={i} className="mr-2">
                               • {m.name}
@@ -231,7 +231,7 @@ export default function KitchenDisplay() {
                       )}
 
                       {item.specialNote && (
-                        <div className="text-[10px] text-rose-300 font-semibold pl-7 mt-0.5 italic">
+                        <div className="text-[10px] text-rose-300 pl-7 mt-0.5 italic">
                           Not: {item.specialNote}
                         </div>
                       )}
@@ -243,14 +243,14 @@ export default function KitchenDisplay() {
               {/* Quick Batch Complete Button */}
               <button
                 onClick={() => handleCompleteAllTicket(order.id, displayItems)}
-                className={`w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm ${
+                className={`w-full py-2.5 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm ${
                   isAllReady
-                    ? 'bg-emerald-500 text-stone-950'
-                    : 'bg-stone-800 hover:bg-emerald-600 text-stone-300 hover:text-white'
+                    ? 'bg-emerald-600 text-white shadow-emerald-600/20'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
                 }`}
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>{isAllReady ? 'Sipariş Servise Hazır' : 'Tüm Ürünleri Hazırla'}</span>
+                <span>{isAllReady ? 'Tüm Sipariş Servise Hazır' : 'Tüm Ürünleri Hazırla'}</span>
               </button>
             </div>
           );
